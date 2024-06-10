@@ -1,0 +1,112 @@
+[versions]
+agp = "8.2.0"
+android-compileSdk = "34"
+android-minSdk = "24"
+android-targetSdk = "34"
+androidx-activityCompose = "1.9.0"
+androidx-appcompat = "1.6.1"
+androidx-constraintlayout = "2.1.4"
+androidx-core-ktx = "1.13.1"
+androidx-espresso-core = "3.5.1"
+androidx-material = "1.12.0"
+androidx-test-junit = "1.1.5"
+compose-plugin = "1.6.10"
+junit = "4.13.2"
+kotlin = "2.0.0"
+ktor = "2.3.11"
+logback = "1.5.6"
+ktor-client = "3.0.0-wasm2"
+postgresql = "42.2.2"
+exposed = "0.17.14"
+hikari = "3.2.0"
+commonsCodec = "1.13"
+jdbc-named-parameters = "1.1"
+kquery = "0.17"
+kotlinxDateTime = "0.6.0"
+kotlinxSerialization = "1.6.3"
+koin = "3.6.0-Beta4"
+koin-compose = "1.2.0-Beta4"
+flyway = "10.13.0"
+mockk = "1.13.11"
+voyager = "1.1.0-beta01"
+kottie = "1.8.5"
+kolor = "1.6.1"
+coroutines = "1.9.0-RC"
+turbine = "1.1.0"
+
+[libraries]
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDateTime" }
+kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin"}
+koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
+koin-logger = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-compose" }
+koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin"}
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine"}
+
+#frontend
+voyager-navigator = { group = "cafe.adriel.voyager", name = "voyager-navigator", version.ref = "voyager" }
+voyager-tabNavigator = { group = "cafe.adriel.voyager", name = "voyager-tab-navigator", version.ref = "voyager" }
+voyager-transitions = { group = "cafe.adriel.voyager", name = "voyager-screenmodel", version.ref = "voyager" }
+voyager-screenmodel = { group = "cafe.adriel.voyager", name = "voyager-transitions", version.ref = "voyager" }
+voyager-bottomsheet = { group = "cafe.adriel.voyager", name = "voyager-bottom-sheet-navigator", version.ref = "voyager" }
+voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voyager" }
+material-kolor = { group = "com.materialkolor", name = "material-kolor", version.ref = "kolor" }
+kottie = { group = "io.github.ismai117", name = "kottie", version.ref = "kottie" }
+
+#backend
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql"}
+exposed = { module = "org.jetbrains.exposed:exposed", version.ref = "exposed"}
+hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
+commons-codec = { module = "commons-codec:commons-codec", version.ref = "commonsCodec" }
+jdbc-named-parameters = { module = "com.axiomalaska:jdbc-named-parameters", version.ref = "jdbc-named-parameters" }
+kquery = { module = "com.github.andrewoma.kwery:core", version.ref = "kquery"}
+flyway = { module = "org.flywaydb:flyway-core", version.ref = "flyway"}
+
+#ktor backend
+ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
+ktor-server-tests = { module = "io.ktor:ktor-server-tests-jvm", version.ref = "ktor" }
+ktor-server-auth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor" }
+ktor-server-compression = { module = "io.ktor:ktor-server-compression", version.ref = "ktor" }
+ktor-server-default-headers = { module = "io.ktor:ktor-server-default-headers", version.ref = "ktor" }
+ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging", version.ref = "ktor" }
+ktor-serialization = { module = "io.ktor:ktor-serialization", version.ref = "ktor" }
+
+#ktor client
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor-client" }
+ktor-json = { group = "io.ktor", name = "ktor-client-json", version.ref = "ktor-client" }
+ktor-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor-client" }
+ktor-serialization-ktx = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor-client" }
+
+ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor-client" }
+ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.ref = "ktor-client" }
+ktor-client-java = { group = "io.ktor", name = "ktor-client-java", version.ref = "ktor-client" }
+ktor-client-js = { group = "io.ktor", name = "ktor-client-js", version.ref = "ktor-client" }
+
+[bundles]
+front-end = ["koin-compose", "voyager-bottomsheet", "voyager-navigator", "voyager-koin", "voyager-tabNavigator", "voyager-screenmodel", "voyager-transitions", "kottie", "material-kolor"]
+ktor-client = ["ktor-client-core", "ktor-json", "ktor-content-negotiation", "ktor-serialization-ktx"]
+ktor-backend = ["ktor-server-core", "ktor-server-netty", "ktor-server-auth", "ktor-server-compression", "ktor-server-default-headers", "ktor-server-call-logging", "koin-ktor", "koin-logger", "flyway", "ktor-serialization"]
+database = ["postgresql", "exposed", "hikari", "commons-codec", "jdbc-named-parameters", "kquery"]
+common = ["kotlinx-datetime", "kotlinx-serialization", "koin-core", "kotlinx-coroutines-core"]
+test = ["kotlinx-coroutines-test", "kotlin-test", "koin-test", "turbine"]
+
+[plugins]
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
