@@ -94,7 +94,7 @@ ktor-client-java = { group = "io.ktor", name = "ktor-client-java", version.ref =
 ktor-client-js = { group = "io.ktor", name = "ktor-client-js", version.ref = "ktor-client" }
 
 [bundles]
-front-end = ["koin-compose", "voyager-bottomsheet", "voyager-navigator", "voyager-koin", "voyager-tabNavigator", "voyager-screenmodel", "voyager-transitions", "kottie", "material-kolor"]
+front-end = ["koin-compose", "voyager-bottomsheet", "voyager-navigator", "voyager-tabNavigator", "voyager-screenmodel", "voyager-transitions", "kottie", "material-kolor"]
 ktor-client = ["ktor-client-core", "ktor-json", "ktor-content-negotiation", "ktor-serialization-ktx"]
 ktor-backend = ["ktor-server-core", "ktor-server-netty", "ktor-server-auth", "ktor-server-compression", "ktor-server-default-headers", "ktor-server-call-logging", "koin-ktor", "koin-logger", "flyway", "ktor-serialization"]
 database = ["postgresql", "exposed", "hikari", "commons-codec", "jdbc-named-parameters", "kquery"]

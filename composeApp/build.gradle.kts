@@ -76,6 +76,7 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.bundles.test)
+            api(projects.shared)
         }
     }
 }
@@ -115,6 +116,9 @@ android {
     dependencies {
         debugImplementation(compose.uiTooling)
     }
+}
+dependencies {
+    testImplementation(project(":shared"))
 }
 
 compose.desktop {

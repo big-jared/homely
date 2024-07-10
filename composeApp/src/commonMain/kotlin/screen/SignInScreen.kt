@@ -52,7 +52,9 @@ class SignInScreen: Screen {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(onClick = { /*sign in click event*/ }) {
+            Button(onClick = {
+
+            }) {
                 Text("Sign In")
             }
             Button(onClick = { /*sign in click event*/ }) {

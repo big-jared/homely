@@ -10,10 +10,11 @@ import org.koin.core.component.KoinComponent
 import org.koin.dsl.module
 import service.ApplicationTarget
 import service.target
+import util.isValidEmail
 import kotlin.random.Random
 
 val userModule = module(true) {
-    factory {
+    factory<UserService> {
         if (target.value == ApplicationTarget.Prod) {
             UserServiceDemo()
         } else {
@@ -25,7 +26,7 @@ val userModule = module(true) {
 }
 
 class PreAuthScreenModel(private val userRepository: UserRepository): ScreenModel {
-    val usernameInput = mutableStateOf("")
+    val emailInput = mutableStateOf("")
     val passwordInput = mutableStateOf("")
     val passwordRepeatInput = mutableStateOf("")
     val nameInput = mutableStateOf("")
@@ -35,7 +36,11 @@ class PreAuthScreenModel(private val userRepository: UserRepository): ScreenMode
     }
     
     suspend fun login() {
-        userRepository.login(LoginDto(usernameInput.value, passwordInput.value))
+        if (!emailInput.value.isValidEmail()) {
+            throw Exception("Not valid email.")
+        }
+        
+        userRepository.login(LoginDto(emailInput.value, passwordInput.value))
     }
     
     suspend fun signUp() {
@@ -46,7 +51,7 @@ class PreAuthScreenModel(private val userRepository: UserRepository): ScreenMode
         userRepository.register(
             RegisterDto(
                 nameInput.value,
-                usernameInput.value,
+                emailInput.value,
                 passwordInput.value,
             )
         )

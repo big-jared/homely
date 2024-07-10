@@ -5,14 +5,25 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.materialkolor.DynamicMaterialTheme
+import homely.composeapp.generated.resources.*
+import homely.composeapp.generated.resources.Res
+import homely.composeapp.generated.resources.firacode_bold
+import homely.composeapp.generated.resources.firacode_light
+import homely.composeapp.generated.resources.firacode_medium
+import kotlinx.coroutines.flow.distinctUntilChanged
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinApplication
 import org.koin.compose.koinInject
@@ -29,10 +40,11 @@ fun App() {
         printLogger(Level.DEBUG)
     }) {
         val applicationScreenModel = koinInject<ApplicationScreenModel>()
-        val signedIn = applicationScreenModel.isSignedIn.collectAsState(false)
+        val signedIn = applicationScreenModel.isSignedIn.distinctUntilChanged().collectAsState(false)
         
         DynamicMaterialTheme(
             seedColor = applicationScreenModel.seedColor.value,
+            typography = FiraTypography(),
             style = applicationScreenModel.theme.value
         ) {
             Surface(modifier = Modifier.fillMaxSize()) {
@@ -42,6 +54,38 @@ fun App() {
             }
         }
     }
+}
+
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+fun FiraFontFamily() = FontFamily(
+    Font(Res.font.firacode_light, FontWeight.Light),
+    Font(Res.font.firacode_medium, FontWeight.Normal),
+    Font(Res.font.firacode_medium, FontWeight.Medium),
+    Font(Res.font.firacode_bold, FontWeight.Bold),
+    Font(Res.font.firacode_retina, FontWeight.Thin),
+)
+
+@Composable
+fun FiraTypography() = Typography().run {
+    val fontFamily = FiraFontFamily()
+    copy(
+        displayLarge = displayLarge.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
+        displayMedium = displayMedium.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
+        displaySmall = displaySmall.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
+        headlineLarge = headlineLarge.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
+        headlineMedium = headlineMedium.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
+        headlineSmall = headlineSmall.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
+        titleLarge = titleLarge.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
+        titleMedium = titleMedium.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
+        titleSmall = titleSmall.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
+        bodyLarge = bodyLarge.copy(fontFamily =  fontFamily, fontWeight = FontWeight.Medium),
+        bodyMedium = bodyMedium.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
+        bodySmall = bodySmall.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
+        labelLarge = labelLarge.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
+        labelMedium = labelMedium.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
+        labelSmall = labelSmall.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium)
+    )
 }
 
 abstract class HomelyScreen: Screen {
