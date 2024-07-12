@@ -1,6 +1,6 @@
 package org.sodergutt.homely
 
-import App
+import application.presentation.App
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent

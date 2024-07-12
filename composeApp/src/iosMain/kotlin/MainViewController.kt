@@ -1,4 +1,4 @@
 import androidx.compose.ui.window.ComposeUIViewController
-import kotlinx.coroutines.runBlocking
+import application.presentation.App
 
 fun MainViewController() = ComposeUIViewController { App() }
