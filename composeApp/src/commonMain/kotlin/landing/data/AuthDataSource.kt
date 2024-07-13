@@ -30,21 +30,21 @@ class AuthDataSourceProd(): AuthDataSource {
     }
 }
 
-class AuthDataSourceDemo(): AuthDataSource {
-    private val loggedInUser = UserRecord(
+class AuthDataSourceDemo(isLoggedIn: Boolean = false): AuthDataSource {
+    private val loggedInUser = if (isLoggedIn) UserRecord(
         id = Random.nextInt(),
         name = "Iamtest",
-        username = "Bobert",
+        email = "lirundahusky@gmail.com",
         authToken = Random.nextLong().toString()
-    )
+    ) else null
     
-    override suspend fun getLoggedInUser(): UserRecord = loggedInUser
+    override suspend fun getLoggedInUser(): UserRecord? = loggedInUser
     
     override suspend fun login(loginRequest: LoginDto): UserRecord {
         return UserRecord(
             id = Random.nextInt(),
             name = "Iamtest",
-            username = loginRequest.username,
+            email = loginRequest.email,
             authToken = Random.nextLong().toString()
         )
     }
@@ -53,7 +53,7 @@ class AuthDataSourceDemo(): AuthDataSource {
         return UserRecord(
             id = Random.nextInt(),
             name = credentials.name,
-            username = credentials.username,
+            email = credentials.email,
             authToken = Random.nextLong().toString()
         )
     }

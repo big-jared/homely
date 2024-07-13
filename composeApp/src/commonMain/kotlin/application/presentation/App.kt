@@ -22,11 +22,14 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.materialkolor.DynamicMaterialTheme
+import common.FullScreenProgressIndicator
+import dashboard.presentation.DashboardScreen
 import homely.composeapp.generated.resources.*
 import homely.composeapp.generated.resources.Res
 import homely.composeapp.generated.resources.firacode_bold
 import homely.composeapp.generated.resources.firacode_light
 import homely.composeapp.generated.resources.firacode_medium
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import landing.di.authModule
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -38,7 +41,6 @@ import org.koin.core.logger.Level
 
 val primaryGreen = Color(0xFF4db092)
 val onPrimary = Color(0xFFF6F6F6)
-val lightGreen = Color(0xFF2ecc71)
 
 @Composable
 @Preview
@@ -51,7 +53,6 @@ fun App() {
         printLogger(Level.DEBUG)
     }) {
         val applicationScreenModel = koinInject<ApplicationScreenModel>()
-        val signedIn = applicationScreenModel.isSignedIn.distinctUntilChanged().collectAsState(false)
 
         MaterialTheme(
             colorScheme = lightColorScheme(
@@ -60,13 +61,47 @@ fun App() {
             ),
             typography = FiraTypography(),
         ) {
-            Surface(modifier = Modifier.fillMaxSize()) {
-                Navigator(LandingScreen()) { navigator ->
-                    SlideTransition(navigator)
+            val initialized = applicationScreenModel.initialized.collectAsState(false).value
+            val signedIn = applicationScreenModel.isSignedIn.collectAsState(false).value
+
+            if (!initialized) {
+                FullScreenProgressIndicator()
+            } else {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    Navigator(if(signedIn) DashboardScreen() else LandingScreen()) { navigator ->
+                        SlideTransition(navigator)
+                    }
                 }
             }
         }
     }
+}
+
+interface AuthenticatedScreen: Screen {
+
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val appScreenModel = koinInject<ApplicationScreenModel>()
+
+        LaunchedEffect(null) {
+            appScreenModel.isSignedIn.collectLatest { signedIn ->
+                val screenToStart = when (signedIn) {
+                    true -> DashboardScreen()
+                    false -> LandingScreen()
+                }
+
+                if (screenToStart::class != this@AuthenticatedScreen::class) {
+                    navigator.replaceAll(screenToStart)
+                }
+            }
+        }
+
+        ScreenContent()
+    }
+
+    @Composable
+    fun ScreenContent()
 }
 
 @OptIn(ExperimentalResourceApi::class)
@@ -120,31 +155,3 @@ abstract class HomelyScreen : Screen {
     @Composable
     abstract fun ColumnScope.ScreenContent()
 }
-
-
-//            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-//                FilledTonalButton(onClick = {
-//                    seedColor = Color.hsv(
-//                        Random.nextDouble(360.0).toFloat(),
-//                        Random.nextDouble(1.0).toFloat(),
-//                        Random.nextDouble(1.0).toFloat()
-//                    )
-//                }) {
-//                    Text("Change color")
-//                }
-//                FilledTonalButton(onClick = {
-//                    theme = PaletteStyle.entries.toTypedArray().random()
-//                }) {
-//                    Text("Change theme")
-//                }
-//                FilledTonalButton(onClick = { showContent = !showContent }) {
-//                    Text("Click me!")
-//                }
-//                AnimatedVisibility(showContent) {
-//                    val greeting = remember { Greeting().greet() }
-//                    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-//                        Image(painterResource(Res.drawable.compose_multiplatform), null)
-//                        Text("Compose: $greeting")
-//                    }
-//                }
-//            }

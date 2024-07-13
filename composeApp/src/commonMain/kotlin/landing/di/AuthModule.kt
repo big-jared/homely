@@ -12,9 +12,9 @@ import landing.domain.AuthScreenModel
 val authModule = module(true) {
     factory<AuthDataSource> {
         if (target.value == ApplicationTarget.Prod) {
-            AuthDataSourceDemo()
-        } else {
             AuthDataSourceProd()
+        } else {
+            AuthDataSourceDemo()
         }
     }
     factory { AuthScreenModel(get()) }
