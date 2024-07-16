@@ -16,7 +16,7 @@ enum class ApplicationTarget {
 val target = mutableStateOf(ApplicationTarget.Demo)
 
 class ApplicationScreenModel(private val authRepository: AuthRepository) : ScreenModel {
-    val isSignedIn = authRepository.currentUser.distinctUntilChanged().map { it != null }
+    val isSignedIn = authRepository.currentUser.map { it != null }.distinctUntilChanged()
 
     val initialized by lazy {
         flow {

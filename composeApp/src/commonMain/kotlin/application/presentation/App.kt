@@ -1,6 +1,5 @@
 package application.presentation
 
-import landing.presentation.LandingScreen
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,12 +31,16 @@ import homely.composeapp.generated.resources.firacode_medium
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import landing.di.authModule
+import landing.presentation.LandingScreen
+import onboarding.data.OnboardingScreen
+import onboarding.di.onboardingModule
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinApplication
 import org.koin.compose.koinInject
 import org.koin.core.logger.Level
+import subscription.di.subscriptionModule
 
 val primaryGreen = Color(0xFF4db092)
 val onPrimary = Color(0xFFF6F6F6)
@@ -49,6 +52,8 @@ fun App() {
         modules(
             authModule,
             applicationModule,
+            onboardingModule,
+            subscriptionModule,
         )
         printLogger(Level.DEBUG)
     }) {
@@ -68,8 +73,22 @@ fun App() {
                 FullScreenProgressIndicator()
             } else {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    Navigator(if(signedIn) DashboardScreen() else LandingScreen()) { navigator ->
+                    Navigator(if(signedIn) OnboardingScreen() else LandingScreen()) { navigator ->
                         SlideTransition(navigator)
+
+//                        LaunchedEffect(null) {
+//                            applicationScreenModel.isSignedIn.collectLatest { signedIn ->
+//                                val screenToStart = when (signedIn) {
+//                                    true -> OnboardingScreen()
+//                                    false -> LandingScreen()
+//                                }
+//
+//                                // FIXME
+//                                try {
+//                                    navigator.replaceAll(screenToStart)
+//                                } catch (e: Exception) {}
+//                            }
+//                        }
                     }
                 }
             }
@@ -83,19 +102,6 @@ interface AuthenticatedScreen: Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val appScreenModel = koinInject<ApplicationScreenModel>()
-
-        LaunchedEffect(null) {
-            appScreenModel.isSignedIn.collectLatest { signedIn ->
-                val screenToStart = when (signedIn) {
-                    true -> DashboardScreen()
-                    false -> LandingScreen()
-                }
-
-                if (screenToStart::class != this@AuthenticatedScreen::class) {
-                    navigator.replaceAll(screenToStart)
-                }
-            }
-        }
 
         ScreenContent()
     }
