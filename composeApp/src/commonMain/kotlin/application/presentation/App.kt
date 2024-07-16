@@ -3,6 +3,8 @@ package application.presentation
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -13,11 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import application.di.applicationModule
 import application.domain.ApplicationScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.materialkolor.DynamicMaterialTheme
@@ -45,6 +49,7 @@ import subscription.di.subscriptionModule
 val primaryGreen = Color(0xFF4db092)
 val onPrimary = Color(0xFFF6F6F6)
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 @Preview
 fun App() {
@@ -73,22 +78,10 @@ fun App() {
                 FullScreenProgressIndicator()
             } else {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    Navigator(if(signedIn) OnboardingScreen() else LandingScreen()) { navigator ->
-                        SlideTransition(navigator)
-
-//                        LaunchedEffect(null) {
-//                            applicationScreenModel.isSignedIn.collectLatest { signedIn ->
-//                                val screenToStart = when (signedIn) {
-//                                    true -> OnboardingScreen()
-//                                    false -> LandingScreen()
-//                                }
-//
-//                                // FIXME
-//                                try {
-//                                    navigator.replaceAll(screenToStart)
-//                                } catch (e: Exception) {}
-//                            }
-//                        }
+                    BottomSheetNavigator(sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)) {
+                        Navigator(if(signedIn) OnboardingScreen() else LandingScreen()) { navigator ->
+                            SlideTransition(navigator)
+                        }
                     }
                 }
             }
@@ -102,6 +95,17 @@ interface AuthenticatedScreen: Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val appScreenModel = koinInject<ApplicationScreenModel>()
+
+        LaunchedEffect(null) {
+            appScreenModel.isSignedIn.collectLatest { signedIn ->
+                val screenToStart = when (signedIn) {
+                    true -> OnboardingScreen()
+                    false -> LandingScreen()
+                }
+
+                navigator.replaceAll(screenToStart)
+            }
+        }
 
         ScreenContent()
     }
