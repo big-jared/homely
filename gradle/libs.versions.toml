@@ -33,6 +33,7 @@ kottie = "1.8.5"
 kolor = "1.6.1"
 coroutines = "1.9.0-RC"
 turbine = "1.1.0"
+playServicesFitness = "21.2.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -92,6 +93,7 @@ ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version
 ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.ref = "ktor-client" }
 ktor-client-java = { group = "io.ktor", name = "ktor-client-java", version.ref = "ktor-client" }
 ktor-client-js = { group = "io.ktor", name = "ktor-client-js", version.ref = "ktor-client" }
+play-services-fitness = { group = "com.google.android.gms", name = "play-services-fitness", version.ref = "playServicesFitness" }
 
 [bundles]
 front-end = ["koin-compose", "voyager-bottomsheet", "voyager-navigator", "voyager-tabNavigator", "voyager-screenmodel", "voyager-transitions", "kottie", "material-kolor"]

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Typography
@@ -25,19 +24,15 @@ import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.materialkolor.DynamicMaterialTheme
+import com.materialkolor.PaletteStyle
+import com.materialkolor.ktx.darken
 import common.FullScreenProgressIndicator
-import dashboard.presentation.DashboardScreen
 import homely.composeapp.generated.resources.*
-import homely.composeapp.generated.resources.Res
-import homely.composeapp.generated.resources.firacode_bold
-import homely.composeapp.generated.resources.firacode_light
-import homely.composeapp.generated.resources.firacode_medium
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
 import landing.di.authModule
 import landing.presentation.LandingScreen
-import onboarding.data.OnboardingScreen
 import onboarding.di.onboardingModule
+import onboarding.presentation.OnboardingScreen
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -64,23 +59,24 @@ fun App() {
     }) {
         val applicationScreenModel = koinInject<ApplicationScreenModel>()
 
-        MaterialTheme(
-            colorScheme = lightColorScheme(
-                primary = primaryGreen,
-                onPrimary = onPrimary,
-            ),
-            typography = FiraTypography(),
-        ) {
-            val initialized = applicationScreenModel.initialized.collectAsState(false).value
-            val signedIn = applicationScreenModel.isSignedIn.collectAsState(false).value
+        val initialized = applicationScreenModel.initialized.collectAsState(false).value
+        val signedIn = applicationScreenModel.isSignedIn.collectAsState(false).value
 
-            if (!initialized) {
-                FullScreenProgressIndicator()
-            } else {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    BottomSheetNavigator(sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)) {
-                        Navigator(if(signedIn) OnboardingScreen() else LandingScreen()) { navigator ->
-                            SlideTransition(navigator)
+        if (!initialized) {
+            FullScreenProgressIndicator()
+        } else {
+            LightTheme {
+                BottomSheetNavigator(
+                    sheetShape = RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp
+                    )
+                ) {
+                    Navigator(if (signedIn) OnboardingScreen() else LandingScreen()) { navigator ->
+                        LightTheme {
+                            Surface(modifier = Modifier.fillMaxSize()) {
+                                SlideTransition(navigator)
+                            }
                         }
                     }
                 }
@@ -89,7 +85,7 @@ fun App() {
     }
 }
 
-interface AuthenticatedScreen: Screen {
+interface AuthenticatedScreen : Screen {
 
     @Composable
     override fun Content() {
@@ -128,15 +124,30 @@ fun FiraFontFamily() = FontFamily(
 fun FiraTypography() = Typography().run {
     val fontFamily = FiraFontFamily()
     copy(
-        displayLarge = displayLarge.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
-        displayMedium = displayMedium.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
-        displaySmall = displaySmall.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
-        headlineLarge = headlineLarge.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
+        displayLarge = displayLarge.copy(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight.Medium
+        ),
+        displayMedium = displayMedium.copy(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight.Medium
+        ),
+        displaySmall = displaySmall.copy(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight.Medium
+        ),
+        headlineLarge = headlineLarge.copy(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight.Medium
+        ),
         headlineMedium = headlineMedium.copy(
             fontFamily = fontFamily,
             fontWeight = FontWeight.Medium
         ),
-        headlineSmall = headlineSmall.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
+        headlineSmall = headlineSmall.copy(
+            fontFamily = fontFamily,
+            fontWeight = FontWeight.Medium
+        ),
         titleLarge = titleLarge.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
         titleMedium = titleMedium.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
         titleSmall = titleSmall.copy(fontFamily = fontFamily, fontWeight = FontWeight.Medium),
@@ -164,4 +175,29 @@ abstract class HomelyScreen : Screen {
 
     @Composable
     abstract fun ColumnScope.ScreenContent()
+}
+
+@Composable
+fun DarkTheme(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    DynamicMaterialTheme(
+        seedColor = primaryGreen.darken(),
+        useDarkTheme = true,
+        style = PaletteStyle.Rainbow,
+        typography = FiraTypography()
+    ) {
+        content()
+    }
+}
+
+@Composable
+fun LightTheme(content: @Composable () -> Unit) {
+    MaterialTheme(
+        colorScheme = lightColorScheme(
+            primary = primaryGreen,
+            onPrimary = onPrimary,
+        ),
+        typography = FiraTypography(),
+    ) {
+        content()
+    }
 }

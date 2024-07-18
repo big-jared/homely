@@ -118,6 +118,7 @@ android {
     }
 }
 dependencies {
+    implementation(libs.play.services.fitness)
     testImplementation(project(":shared"))
 }
 
