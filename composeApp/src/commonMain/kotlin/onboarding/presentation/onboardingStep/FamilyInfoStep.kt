@@ -77,6 +77,9 @@ class FamilyInfo : OnboardingStep() {
                 value = familyViewModel.familyName,
                 onValueChange = { familyViewModel.familyName = it })
         }
+
+        // Future use google places api
+        // https://stackoverflow.com/questions/70834787/implementing-google-places-autocomplete-textfield-implementation-in-jetpack-comp/72586090#72586090
         Row(modifier = Modifier.padding(top = 16.dp)) {
             Row(Modifier.weight(.5f)) {
                 Text(modifier = Modifier.align(Alignment.CenterVertically), text = "Zipcode")
