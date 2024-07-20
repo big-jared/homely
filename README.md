@@ -1,3 +1,8 @@
+Homeschooling app featuring record keeping, grade tracking/GPA, and state registration
+
+Foundation still in progress
+
+
 This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop, Server.
 
 * `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
