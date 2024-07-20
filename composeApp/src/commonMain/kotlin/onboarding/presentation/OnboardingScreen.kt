@@ -103,7 +103,10 @@ class OnboardingScreen() : AuthenticatedScreen {
         } else {
             Column {
                 AnimatedVisibility(activeStepIndex.value != 0) {
-                    Row(modifier = Modifier.fillMaxWidth().background(color = MaterialTheme.colorScheme.primary)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                            .background(color = MaterialTheme.colorScheme.primary)
+                    ) {
                         Row(
                             modifier = Modifier.heightIn(max = 144.dp)
                                 .horizontalScroll(rememberScrollState())
@@ -126,16 +129,14 @@ class OnboardingScreen() : AuthenticatedScreen {
                                 }
                             }
                             viewModel.steps.forEachIndexed { index, step ->
-                                if (index >= activeStepIndex.value) {
-                                    StepRow(
-                                        modifier = Modifier.padding(end = 8.dp)
-                                            .padding(vertical = 24.dp)
-                                            .align(Alignment.CenterVertically),
-                                        step = step,
-                                        active = index == activeStepIndex.value,
-                                        viewModel = viewModel
-                                    )
-                                }
+                                StepRow(
+                                    modifier = Modifier.padding(end = 8.dp)
+                                        .padding(vertical = 24.dp)
+                                        .align(Alignment.CenterVertically),
+                                    step = step,
+                                    active = index == activeStepIndex.value,
+                                    viewModel = viewModel
+                                )
                             }
                         }
                     }
@@ -152,7 +153,12 @@ class OnboardingScreen() : AuthenticatedScreen {
     }
 
     @Composable
-    fun StepRow(modifier: Modifier = Modifier, step: OnboardingStep, active: Boolean, viewModel: OnboardingViewModel) {
+    fun StepRow(
+        modifier: Modifier = Modifier,
+        step: OnboardingStep,
+        active: Boolean,
+        viewModel: OnboardingViewModel
+    ) {
         val coScope = rememberCoroutineScope()
         HighlightBox(
             modifier = modifier,
@@ -160,7 +166,6 @@ class OnboardingScreen() : AuthenticatedScreen {
             backgroundColor = MaterialTheme.colorScheme.background.copy(alpha = if (active) 1f else .4f),
             color = MaterialTheme.colorScheme.primary,
             onClick = {
-                if (!isHorizontalLayout()) return@HighlightBox
                 coScope.launch {
                     viewModel.goTo(step)
                 }

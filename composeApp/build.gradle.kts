@@ -133,3 +133,14 @@ compose.desktop {
         }
     }
 }
+
+task("releaseWasm") {
+    dependsOn("wasmJsBrowserDistribution")
+    doLast {
+        exec {
+            commandLine("rm", "-rf", "$workingDir/../docs")
+            commandLine("mkdir", "$workingDir/../docs")
+            commandLine("mv", "$workingDir/build/dist/wasmJs/productionExecutable/*", "$workingDir/../docs")
+        }
+    }
+}

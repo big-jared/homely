@@ -2,18 +2,10 @@ package onboarding.presentation.onboardingStep
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -22,6 +14,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -30,7 +26,10 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.materialkolor.ktx.harmonize
 import common.AppIconButton
+import kotlinx.datetime.Instant
 import onboarding.presentation.OnboardingResult
+import onboarding.presentation.isHorizontalLayout
+import kotlin.time.Duration
 
 data class StudentInput(
     val name: MutableState<String?> = mutableStateOf(null),
@@ -39,19 +38,115 @@ data class StudentInput(
     fun isValid(): Boolean = !name.value.isNullOrBlank() && (gradeLevel.value ?: 0) > 0
 }
 
-class FamilyInfoViewModel: ScreenModel {
-    var familyName by mutableStateOf("")
-    var zipcode by mutableStateOf("")
-    var students by mutableStateOf(listOf(StudentInput()))
+enum class StudentGrade {
+    First, Second, Third, Fourth, Fifth, Sixth, Seventh, Eighth, Nineth, Tenth, Eleventh, Twelfth
+}
 
-    fun canContinue() = if (familyName.isNotBlank() && zipcode.isNotBlank() && students.all { it.isValid() }) {
+enum class CourseGrade(val display: String) {
+    A("A"), AMinus("A-"), BPlus("B+"), B("B"), BMinus("B-"), CPlus("C+"), C("C"), CMinus("C-"), DPlus("D+"), D("D"), DMinus( "D-"
+    ),
+    F("F")
+}
+
+fun defaultGradeScale() = GradeScale(
+    aThreshold = 93.0,
+    aMinusThreshold = 90.0,
+    bPlusThreshold = 87.0,
+    bThreshold = 83.0,
+    bMinusThreshold = 80.0,
+    cPlusThreshold = 77.0,
+    cThreshold = 73.0,
+    cMinusThreshold = 70.0,
+    dPlusThreshold = 67.0,
+    dThreshold = 63.0
+)
+
+data class GradeScale(
+    val aThreshold: Double,
+    val aMinusThreshold: Double,
+    val bPlusThreshold: Double,
+    val bThreshold: Double,
+    val bMinusThreshold: Double,
+    val cPlusThreshold: Double,
+    val cThreshold: Double,
+    val cMinusThreshold: Double,
+    val dPlusThreshold: Double,
+    val dThreshold: Double,
+    val fThreshold: Double = 0.0,
+) {
+    fun resolveGrade(percentage: Double): CourseGrade = when (percentage) {
+        in Double.MAX_VALUE..aThreshold -> CourseGrade.A
+        in aThreshold..aMinusThreshold -> CourseGrade.AMinus
+        in aMinusThreshold..bPlusThreshold -> CourseGrade.BPlus
+        in bPlusThreshold..bThreshold -> CourseGrade.B
+        in bThreshold..bMinusThreshold -> CourseGrade.BMinus
+        in bMinusThreshold..cPlusThreshold -> CourseGrade.CPlus
+        in cPlusThreshold..cThreshold -> CourseGrade.C
+        in cThreshold..cMinusThreshold -> CourseGrade.CMinus
+        in cMinusThreshold..dPlusThreshold -> CourseGrade.DPlus
+        in dPlusThreshold..dThreshold -> CourseGrade.D
+        else -> CourseGrade.F
+    }
+}
+
+data class Assignment(
+    val name: String,
+    val received: Int? = null,
+    val possible: Int,
+    val notes: String,
+    val dueDate: Instant? = null,
+    val duration: Duration? = null,
+)
+
+data class GradeCategory(
+    val name: String,
+    val weight: Double,
+    val assignments: List<Assignment>
+)
+
+data class Course(
+    val name: String,
+    val color: Int,
+    val scale: GradeScale,
+    val categories: List<GradeCategory>
+)
+
+data class Term(
+    val name: String,
+    val courses: List<Course>,
+)
+
+data class Student(
+    val name: String,
+    val grade: StudentGrade,
+    val terms: List<Term>,
+    val activeTerm: Term,
+)
+
+data class Family(
+    val familyName: String,
+    val city: String,
+    val students: List<Student>
+)
+
+class FamilyRepository {
+
+}
+
+class FamilyInfoViewModel : ScreenModel {
+    var familyName by mutableStateOf("")
+    var city by mutableStateOf("")
+    var students by mutableStateOf(listOf(StudentInput()))
+    var gradeScale by mutableStateOf(defaultGradeScale())
+
+    fun canContinue() = if (familyName.isNotBlank() && city.isNotBlank() && students.all { it.isValid() }) {
         OnboardingResult.Success
     } else {
         OnboardingResult.Failure(
             message = if (familyName.isBlank()) {
                 "Please enter your family name"
-            } else if (zipcode.isBlank()) {
-                "The zipcode entered is incorrect or missing"
+            } else if (city.isBlank()) {
+                "The city entered is invalid or missing"
             } else {
                 "Please fill in all student fields"
             }
@@ -60,8 +155,8 @@ class FamilyInfoViewModel: ScreenModel {
 }
 
 class FamilyInfo : OnboardingStep() {
-    override val name = "Family Info"
-    override val contentCta = "Setup your family"
+    override val name = "Courses"
+    override val contentCta = "Set up your students"
 
     private val familyViewModel = FamilyInfoViewModel()
 
@@ -70,7 +165,7 @@ class FamilyInfo : OnboardingStep() {
         val bottomSheetNavigator = LocalBottomSheetNavigator.current
 
         Row {
-            Column(Modifier.weight(.5f)) {
+            Column(modifier = Modifier.weight(.5f)) {
                 Text(text = "Family Name")
             }
             OutlinedTextField(modifier = Modifier.padding(start = 16.dp).weight(.5f),
@@ -82,7 +177,7 @@ class FamilyInfo : OnboardingStep() {
         // https://stackoverflow.com/questions/70834787/implementing-google-places-autocomplete-textfield-implementation-in-jetpack-comp/72586090#72586090
         Row(modifier = Modifier.padding(top = 16.dp)) {
             Row(Modifier.weight(.5f)) {
-                Text(modifier = Modifier.align(Alignment.CenterVertically), text = "Zipcode")
+                Text(modifier = Modifier.align(Alignment.CenterVertically), text = "city")
                 TextButton(onClick = {
                     bottomSheetNavigator.show(ZipcodeBottomsheet())
                 }) {
@@ -90,8 +185,31 @@ class FamilyInfo : OnboardingStep() {
                 }
             }
             OutlinedTextField(modifier = Modifier.padding(start = 16.dp).weight(.5f),
-                value = familyViewModel.zipcode,
-                onValueChange = { familyViewModel.zipcode = it })
+                value = familyViewModel.city,
+                onValueChange = { familyViewModel.city = it })
+        }
+        Row(modifier = Modifier.padding(top = 16.dp)) {
+            Row(Modifier.weight(.5f)) {
+                Text(modifier = Modifier.align(Alignment.CenterVertically), text = "Grading Scale")
+                TextButton(onClick = {
+                    bottomSheetNavigator.show(ZipcodeBottomsheet())
+                }) {
+                    Text("What's this?")
+                }
+            }
+
+            Box(modifier = Modifier.fillMaxWidth().height(40.dp).padding(all = 16.dp).drawWithContent {
+                drawIntoCanvas {
+                    drawLine(start = Offset(0f, 0f), end =  Offset(size.width, 0f), color = Color.Black)
+                    familyViewModel.gradeScale
+                    drawLine(start = Offset(0f, 0f), end =  Offset(size.width, 0f), color = Color.Black)
+
+                }
+            })
+
+            OutlinedTextField(modifier = Modifier.padding(start = 16.dp).weight(.5f),
+                value = familyViewModel.city,
+                onValueChange = { familyViewModel.city = it })
         }
         Column(Modifier.fillMaxWidth().padding(top = 24.dp)) {
             Row {
