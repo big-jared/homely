@@ -134,6 +134,7 @@ compose.desktop {
     }
 }
 
+//./gradlew wasmJsBrowserRun -t
 task("releaseWasm") {
     dependsOn("wasmJsBrowserDistribution")
     doLast {

@@ -2,11 +2,20 @@ package onboarding.presentation.onboardingStep
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Grade
+import androidx.compose.material.icons.rounded.School
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,36 +23,49 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.materialkolor.ktx.harmonize
 import common.AppIconButton
+import common.FullScreenProgressIndicator
+import common.HighlightBox
+import homely.composeapp.generated.resources.Res
 import kotlinx.datetime.Instant
+import onboarding.data.DemoOnboardingDataSource
+import onboarding.data.OnboardingDataSource
+import onboarding.data.OnboardingRepository
+import onboarding.domain.OnboardingViewModel
 import onboarding.presentation.OnboardingResult
-import onboarding.presentation.isHorizontalLayout
+import org.jetbrains.compose.resources.imageResource
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.vectorResource
+import org.koin.compose.koinInject
+import org.koin.dsl.module
 import kotlin.time.Duration
 
 data class StudentInput(
     val name: MutableState<String?> = mutableStateOf(null),
-    val gradeLevel: MutableState<Int?> = mutableStateOf(null),
+    val gradeLevel: MutableState<StudentGrade?> = mutableStateOf(null),
 ) {
-    fun isValid(): Boolean = !name.value.isNullOrBlank() && (gradeLevel.value ?: 0) > 0
+    fun isValid(): Boolean = !name.value.isNullOrBlank() && gradeLevel.value != null
+    fun toStudent(): Student =
+        Student(name = name.value ?: "", grade = gradeLevel.value ?: StudentGrade.First)
 }
 
 enum class StudentGrade {
-    First, Second, Third, Fourth, Fifth, Sixth, Seventh, Eighth, Nineth, Tenth, Eleventh, Twelfth
+    PreK, Kindergarten, First, Second, Third, Fourth, Fifth, Sixth, Seventh, Eighth, Ninth, Tenth, Eleventh, Twelfth
 }
 
 enum class CourseGrade(val display: String) {
-    A("A"), AMinus("A-"), BPlus("B+"), B("B"), BMinus("B-"), CPlus("C+"), C("C"), CMinus("C-"), DPlus("D+"), D("D"), DMinus( "D-"
+    A("A"), AMinus("A-"), BPlus("B+"), B("B"), BMinus("B-"), CPlus("C+"), C("C"), CMinus("C-"), DPlus(
+        "D+"
+    ),
+    D("D"), DMinus(
+        "D-"
     ),
     F("F")
 }
@@ -119,114 +141,164 @@ data class Term(
 data class Student(
     val name: String,
     val grade: StudentGrade,
-    val terms: List<Term>,
-    val activeTerm: Term,
-)
+    val allTerms: List<Term>? = null,
+    val activeTerm: Term? = null,
+) {
+    fun toStudentInput() = StudentInput(
+        name = mutableStateOf(name),
+        gradeLevel = mutableStateOf(grade),
+    )
+}
 
 data class Family(
     val familyName: String,
     val city: String,
     val students: List<Student>
-)
-
-class FamilyRepository {
-
+) {
+    fun toFamilyUiState() = FamilyUiState(
+        familyName = mutableStateOf(familyName),
+        city = mutableStateOf(city),
+        students = mutableStateOf(students.map { it.toStudentInput() }),
+    )
 }
 
-class FamilyInfoViewModel : ScreenModel {
-    var familyName by mutableStateOf("")
-    var city by mutableStateOf("")
-    var students by mutableStateOf(listOf(StudentInput()))
-    var gradeScale by mutableStateOf(defaultGradeScale())
+interface FamilyDataSource {
+    suspend fun putFamily(family: Family)
+    suspend fun getFamily(): Family?
+}
 
-    fun canContinue() = if (familyName.isNotBlank() && city.isNotBlank() && students.all { it.isValid() }) {
-        OnboardingResult.Success
-    } else {
-        OnboardingResult.Failure(
-            message = if (familyName.isBlank()) {
-                "Please enter your family name"
-            } else if (city.isBlank()) {
-                "The city entered is invalid or missing"
-            } else {
-                "Please fill in all student fields"
-            }
-        )
+class DemoFamilyDataSource(var existingFamily: Family? = null) : FamilyDataSource {
+    override suspend fun putFamily(family: Family) {
+        existingFamily = family
+    }
+
+    override suspend fun getFamily(): Family? = existingFamily
+}
+
+class FamilyRepository(val familyDataSource: FamilyDataSource) {
+    val currentFamily: Family? get() = _currentFamily
+    private var _currentFamily: Family? = null
+
+    suspend fun initialize() {
+        if (_currentFamily == null) {
+            _currentFamily = familyDataSource.getFamily()
+        }
+    }
+
+    suspend fun update(family: Family) {
+        familyDataSource.putFamily(family)
+        _currentFamily = family
     }
 }
 
+data class FamilyUiState(
+    var familyName: MutableState<String> = mutableStateOf(""),
+    var city: MutableState<String> = mutableStateOf(""),
+    var students: MutableState<List<StudentInput>> = mutableStateOf(listOf(StudentInput()))
+) {
+    fun toFamily(): Family = Family(
+        familyName = familyName.value,
+        city = city.value,
+        students = students.value.map { it.toStudent() }
+    )
+}
+
+
+class FamilyInfoViewModel(private val familyRepository: FamilyRepository) : ScreenModel {
+    val familyUiState = mutableStateOf<FamilyUiState?>(null)
+
+    suspend fun initialize() {
+        familyRepository.initialize()
+        familyUiState.value = familyRepository.currentFamily?.toFamilyUiState() ?: FamilyUiState()
+    }
+
+    fun canContinue(): OnboardingResult {
+        val family = familyUiState.value
+            ?: return OnboardingResult.Failure(message = "Unexpected Error Occurred, try again")
+
+        return if (family.familyName.value.isNotBlank() && family.city.value.isNotBlank() && family.students.value.all { it.isValid() }) {
+            OnboardingResult.Success
+        } else {
+            OnboardingResult.Failure(
+                message = if (family.familyName.value.isBlank()) {
+                    "Please enter your family name"
+                } else if (family.city.value.isBlank()) {
+                    "The city entered is invalid or missing"
+                } else {
+                    "Please fill in all student fields"
+                }
+            )
+        }
+    }
+}
+
+val familyModule = module {
+    single<FamilyDataSource> { DemoFamilyDataSource() }
+    single { FamilyRepository(get()) }
+    single { FamilyInfoViewModel(get()) }
+}
+
 class FamilyInfo : OnboardingStep() {
-    override val name = "Courses"
+    override val name = "Family"
     override val contentCta = "Set up your students"
 
-    private val familyViewModel = FamilyInfoViewModel()
+    private lateinit var familyViewModel: FamilyInfoViewModel
 
     @Composable
     override fun ColumnScope.OnboardingContent() {
         val bottomSheetNavigator = LocalBottomSheetNavigator.current
+        familyViewModel = koinInject()
 
-        Row {
-            Column(modifier = Modifier.weight(.5f)) {
-                Text(text = "Family Name")
-            }
-            OutlinedTextField(modifier = Modifier.padding(start = 16.dp).weight(.5f),
-                value = familyViewModel.familyName,
-                onValueChange = { familyViewModel.familyName = it })
+        LaunchedEffect(null) {
+            familyViewModel.initialize()
         }
 
-        // Future use google places api
-        // https://stackoverflow.com/questions/70834787/implementing-google-places-autocomplete-textfield-implementation-in-jetpack-comp/72586090#72586090
-        Row(modifier = Modifier.padding(top = 16.dp)) {
-            Row(Modifier.weight(.5f)) {
-                Text(modifier = Modifier.align(Alignment.CenterVertically), text = "city")
-                TextButton(onClick = {
-                    bottomSheetNavigator.show(ZipcodeBottomsheet())
-                }) {
-                    Text("Why?")
-                }
-            }
-            OutlinedTextField(modifier = Modifier.padding(start = 16.dp).weight(.5f),
-                value = familyViewModel.city,
-                onValueChange = { familyViewModel.city = it })
-        }
-        Row(modifier = Modifier.padding(top = 16.dp)) {
-            Row(Modifier.weight(.5f)) {
-                Text(modifier = Modifier.align(Alignment.CenterVertically), text = "Grading Scale")
-                TextButton(onClick = {
-                    bottomSheetNavigator.show(ZipcodeBottomsheet())
-                }) {
-                    Text("What's this?")
-                }
-            }
-
-            Box(modifier = Modifier.fillMaxWidth().height(40.dp).padding(all = 16.dp).drawWithContent {
-                drawIntoCanvas {
-                    drawLine(start = Offset(0f, 0f), end =  Offset(size.width, 0f), color = Color.Black)
-                    familyViewModel.gradeScale
-                    drawLine(start = Offset(0f, 0f), end =  Offset(size.width, 0f), color = Color.Black)
-
-                }
-            })
-
-            OutlinedTextField(modifier = Modifier.padding(start = 16.dp).weight(.5f),
-                value = familyViewModel.city,
-                onValueChange = { familyViewModel.city = it })
-        }
-        Column(Modifier.fillMaxWidth().padding(top = 24.dp)) {
+        familyViewModel.familyUiState.value?.let { family ->
             Row {
-                Text(
-                    modifier = Modifier.weight(1f).align(Alignment.CenterVertically),
-                    text = "Students",
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                AppIconButton(modifier = Modifier, onClick = {
-                    familyViewModel.students = familyViewModel.students.toMutableList().also { it.add(StudentInput()) }
-                })
+                Column(modifier = Modifier.weight(.5f)) {
+                    Text(text = "Family Name")
+                }
+                OutlinedTextField(modifier = Modifier.padding(start = 16.dp).weight(.5f),
+                    value = family.familyName.value,
+                    onValueChange = { family.familyName.value = it })
             }
-            familyViewModel.students.forEachIndexed { index, student ->
-                StudentRow(index = index, student = student, remove = { studentInput ->
-                    familyViewModel.students = familyViewModel.students.toMutableList().also { it.remove(studentInput) }
-                })
+
+            // Future use google places api
+            // https://stackoverflow.com/questions/70834787/implementing-google-places-autocomplete-textfield-implementation-in-jetpack-comp/72586090#72586090
+            Row(modifier = Modifier.padding(top = 16.dp)) {
+                Row(Modifier.weight(.5f)) {
+                    Text(modifier = Modifier.align(Alignment.CenterVertically), text = "City")
+                    TextButton(onClick = {
+                        bottomSheetNavigator.show(ZipcodeBottomsheet())
+                    }) {
+                        Text("Why?")
+                    }
+                }
+                OutlinedTextField(modifier = Modifier.padding(start = 16.dp).weight(.5f),
+                    value = family.city.value,
+                    onValueChange = { family.city.value = it })
             }
+            Column(Modifier.fillMaxWidth().padding(top = 24.dp)) {
+                Row {
+                    Text(
+                        modifier = Modifier.weight(1f).align(Alignment.CenterVertically),
+                        text = "Students",
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                    AppIconButton(modifier = Modifier, onClick = {
+                        family.students.value =
+                            family.students.value.toMutableList().also { it.add(StudentInput()) }
+                    })
+                }
+                family.students.value.forEachIndexed { index, student ->
+                    StudentRow(index = index, student = student, remove = { studentInput ->
+                        family.students.value =
+                            family.students.value.toMutableList().also { it.remove(studentInput) }
+                    })
+                }
+            }
+        } ?: run {
+            FullScreenProgressIndicator()
         }
     }
 
@@ -246,20 +318,69 @@ class FamilyInfo : OnboardingStep() {
                 targetState = true
             }
         }
+        var dialogShowing by remember { mutableStateOf(false) }
 
         AnimatedVisibility(
             visibleState = state,
         ) {
             Row(modifier = modifier.padding(top = 4.dp)) {
-                OutlinedTextField(modifier = Modifier.weight(.5f),
+                OutlinedTextField(modifier = Modifier.weight(.8f),
                     value = student.name.value ?: "",
                     label = { Text("Name") },
-                    onValueChange = { student.name.value = it })
-                OutlinedTextField(modifier = Modifier.padding(start = 16.dp)
-                    .weight(if (index == 0) .5f else .3f),
-                    value = student.gradeLevel.value?.toString() ?: "",
-                    label = { Text(if (index == 0) "Grade Level" else "Grade") },
-                    onValueChange = { student.gradeLevel.value = it.toIntOrNull() })
+                    onValueChange = { student.name.value = it },
+                    shape = CircleShape,
+                    trailingIcon = {
+                        HighlightBox(
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                                .padding(horizontal = 8.dp, vertical = 4.dp),
+                            text = student.gradeLevel.value?.name ?: "Select Grade",
+                            color = MaterialTheme.colorScheme.primary,
+                            backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
+                            frontIcon = {
+                                Icon(
+                                    rememberVectorPainter(Icons.Rounded.School),
+                                    null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            },
+                            onClick = {
+                                dialogShowing = true
+                            })
+                    })
+
+                if (dialogShowing) {
+                    var gradeLevel by mutableStateOf(student.gradeLevel.value)
+                    common.AlertDialogWithContent(
+                        title = "Select students grade level",
+                        onClose = {
+                            student.gradeLevel.value = gradeLevel
+                            dialogShowing = false
+                        },
+                        content = {
+                            Column(Modifier.verticalScroll(rememberScrollState())) {
+                                StudentGrade.entries.forEach {
+                                    Row(
+                                        Modifier
+                                            .clickable { gradeLevel = it }
+                                            .background(
+                                                color = if (gradeLevel == it) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                                shape = RoundedCornerShape(16.dp)
+                                            )
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp)
+                                    ) {
+                                        Text(
+                                            modifier = Modifier.padding(horizontal = 8.dp),
+                                            text = it.name,
+                                            color = if (gradeLevel == it) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onBackground
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    )
+                }
+
                 if (index != 0) {
                     Box(
                         modifier = Modifier.align(Alignment.CenterVertically).padding(start = 4.dp)

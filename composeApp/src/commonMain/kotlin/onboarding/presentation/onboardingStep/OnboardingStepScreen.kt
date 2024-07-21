@@ -40,7 +40,7 @@ import onboarding.presentation.isHorizontalLayout
 import org.koin.compose.koinInject
 
 
-abstract class OnboardingStep(private val isFinal: Boolean = false, val displayOnly: Boolean = false) : Screen {
+abstract class OnboardingStep(val displayOnly: Boolean = false) : Screen {
     abstract val name: String
     abstract val contentCta: String
 

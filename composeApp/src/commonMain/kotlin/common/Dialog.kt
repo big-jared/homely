@@ -33,3 +33,26 @@ fun BasicAlertDialog(title: String, message: String, buttonText: String = "Ok", 
         },
     )
 }
+
+@Composable
+fun AlertDialogWithContent(title: String? = null, buttonText: String = "Ok", onClose: () -> Unit, content: @Composable () -> Unit) {
+    AlertDialog(
+        onDismissRequest = {
+            onClose()
+        },
+        confirmButton = {
+            Button(modifier = Modifier.padding(top = 24.dp), onClick = {
+                onClose()
+            }) {
+                Text(buttonText,)
+            }
+        },
+        modifier = Modifier,
+        title = title?.let {
+            { Text(it) }
+        },
+        text = {
+            content()
+        },
+    )
+}

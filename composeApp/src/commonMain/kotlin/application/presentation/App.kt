@@ -33,6 +33,7 @@ import landing.di.authModule
 import landing.presentation.LandingScreen
 import onboarding.di.onboardingModule
 import onboarding.presentation.OnboardingScreen
+import onboarding.presentation.onboardingStep.familyModule
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -53,6 +54,7 @@ fun App() {
             authModule,
             applicationModule,
             onboardingModule,
+            familyModule,
             subscriptionModule,
         )
         printLogger(Level.DEBUG)

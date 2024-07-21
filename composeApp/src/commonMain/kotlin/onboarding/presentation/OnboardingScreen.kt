@@ -36,6 +36,7 @@ import common.FullScreenProgressIndicator
 import common.HighlightBox
 import dashboard.presentation.DashboardScreen
 import getPlatform
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import onboarding.domain.OnboardingViewModel
 import onboarding.presentation.onboardingStep.OnboardingStep
@@ -53,22 +54,19 @@ class OnboardingScreen() : AuthenticatedScreen {
     override fun ScreenContent() {
         val viewModel = koinInject<OnboardingViewModel>()
         val initialized = viewModel.initialized.collectAsState()
-        val complete = viewModel.complete.collectAsState()
         val activeStepIndex = viewModel.activeIndexFlow.collectAsState()
         val navigator = LocalNavigator.currentOrThrow
         val coScope = rememberCoroutineScope()
 
         LaunchedEffect(null) {
             viewModel.initialize()
+            viewModel.complete.collectLatest { complete ->
+                if (complete) navigator.replaceAll(DashboardScreen())
+            }
         }
 
         if (!initialized.value) {
             FullScreenProgressIndicator()
-            return
-        }
-
-        if (complete.value) {
-            navigator.replaceAll(DashboardScreen())
             return
         }
 
@@ -167,7 +165,7 @@ class OnboardingScreen() : AuthenticatedScreen {
             color = MaterialTheme.colorScheme.primary,
             onClick = {
                 coScope.launch {
-                    viewModel.goTo(step)
+//                    viewModel.goTo(step)
                 }
             }
         )
