@@ -27,22 +27,25 @@ import com.materialkolor.DynamicMaterialTheme
 import com.materialkolor.PaletteStyle
 import com.materialkolor.ktx.darken
 import common.FullScreenProgressIndicator
+import course.di.coursesModule
+import family.di.familyModule
 import homely.composeapp.generated.resources.*
 import kotlinx.coroutines.flow.collectLatest
 import landing.di.authModule
 import landing.presentation.LandingScreen
 import onboarding.di.onboardingModule
 import onboarding.presentation.OnboardingScreen
-import onboarding.presentation.onboardingStep.familyModule
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinApplication
 import org.koin.compose.koinInject
 import org.koin.core.logger.Level
+import state.di.stateModule
 import subscription.di.subscriptionModule
 
 val primaryGreen = Color(0xFF4db092)
+val primaryContainerGreen = Color(0xFFC9E4DD)
 val onPrimary = Color(0xFFF6F6F6)
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -55,6 +58,8 @@ fun App() {
             applicationModule,
             onboardingModule,
             familyModule,
+            stateModule,
+            coursesModule,
             subscriptionModule,
         )
         printLogger(Level.DEBUG)
@@ -72,7 +77,8 @@ fun App() {
                     sheetShape = RoundedCornerShape(
                         topStart = 16.dp,
                         topEnd = 16.dp
-                    )
+                    ),
+                    sheetBackgroundColor = MaterialTheme.colorScheme.background
                 ) {
                     Navigator(if (signedIn) OnboardingScreen() else LandingScreen()) { navigator ->
                         LightTheme {

@@ -2,7 +2,6 @@ package onboarding.presentation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,7 +12,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +29,6 @@ import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.materialkolor.ktx.harmonize
 import common.AppIconButton
 import common.FullScreenProgressIndicator
 import common.HighlightBox
@@ -45,7 +43,7 @@ import org.koin.compose.koinInject
 
 sealed class OnboardingResult {
     data object Success : OnboardingResult()
-    class Failure(val title: String = "Unable to Continue", val message: String) :
+    class Failure(val title: String = "Unable to Continue", val message: String= "Unknown Error Occurred") :
         OnboardingResult()
 }
 
@@ -105,34 +103,28 @@ class OnboardingScreen() : AuthenticatedScreen {
                         modifier = Modifier.fillMaxWidth()
                             .background(color = MaterialTheme.colorScheme.primary)
                     ) {
-                        Row(
-                            modifier = Modifier.heightIn(max = 144.dp)
-                                .horizontalScroll(rememberScrollState())
-                                .padding(start = 16.dp)
+                        AnimatedVisibility(
+                            modifier = Modifier.align(Alignment.CenterVertically),
+                            visible = viewModel.activeIndexFlow.value > 1
                         ) {
-                            if (!isHorizontalLayout()) {
-                                AnimatedVisibility(
-                                    modifier = Modifier.align(Alignment.CenterVertically),
-                                    visible = viewModel.activeIndexFlow.value > 1
-                                ) {
-                                    AppIconButton(
-                                        modifier = Modifier.padding(end = 8.dp).size(42.dp),
-                                        painter = rememberVectorPainter(Icons.AutoMirrored.Rounded.ArrowBack),
-                                        containerColor = MaterialTheme.colorScheme.background,
-                                        onClick = {
-                                            coScope.launch {
-                                                viewModel.back()
-                                            }
-                                        })
-                                }
-                            }
-                            viewModel.steps.forEachIndexed { index, step ->
+                            AppIconButton(
+                                modifier = Modifier.padding(start = 8.dp).size(42.dp),
+                                painter = rememberVectorPainter(Icons.AutoMirrored.Rounded.ArrowBack),
+                                containerColor = MaterialTheme.colorScheme.background,
+                                onClick = {
+                                    coScope.launch {
+                                        viewModel.back()
+                                    }
+                                })
+                        }
+                        LazyRow(modifier = Modifier.heightIn(max = 144.dp).padding(start = 16.dp),) {
+                            items(viewModel.steps.size - activeStepIndex.value) { index ->
                                 StepRow(
                                     modifier = Modifier.padding(end = 8.dp)
                                         .padding(vertical = 24.dp)
                                         .align(Alignment.CenterVertically),
-                                    step = step,
-                                    active = index == activeStepIndex.value,
+                                    step = viewModel.steps[activeStepIndex.value + index],
+                                    active = activeStepIndex.value + index == activeStepIndex.value,
                                     viewModel = viewModel
                                 )
                             }

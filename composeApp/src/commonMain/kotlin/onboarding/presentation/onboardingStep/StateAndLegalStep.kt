@@ -12,7 +12,7 @@ import onboarding.presentation.OnboardingResult
 
 class StateAndLegal : OnboardingStep() {
     override val name = "State Registration"
-    override val contentCta = "Let us do the legal work for you"
+    override val contentCta = "Register with your state"
 
     override suspend fun evaluateContinue(): OnboardingResult {
         return OnboardingResult.Success

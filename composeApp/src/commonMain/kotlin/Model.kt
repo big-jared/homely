@@ -26,13 +26,6 @@ data class Location(
     val long: Double? = null,
 )
 
-@Serializable
-data class TrackedUserRecord(
-    val id: Int? = null,
-    val name: String,
-    val grade: String,
-)
-
 // What do you want to use the app for
 // Simple (free): grade tracking, record keeping, pdf export
 // Premium: State legal requirements, community Hub, Access to resources
