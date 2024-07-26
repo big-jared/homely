@@ -1,7 +1,16 @@
-Homeschooling app featuring record keeping, grade tracking/GPA, and state registration
+Home school application designed for parents
+
+Planned features:
+- Student setup, classes, gpas, content creation
+- State registration and legal support
+
+Targets: Android, iOS, Desktop, Wasm
 
 Foundation still in progress
 
+Building instructions:
+Wasm: ./gradlew wasmJsBrowserDevelopmentRun
+Desktop: ./gradlew :composeApp:run
 
 This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop, Server.
 
