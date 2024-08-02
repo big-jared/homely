@@ -16,12 +16,10 @@ data class TermUiState(
     val startDate: MutableState<LocalDate?> = mutableStateOf(null),
     val endDate: MutableState<LocalDate?> = mutableStateOf(null),
     val courses: MutableState<List<CourseUiState>> = mutableStateOf(emptyList()),
-) {
-}
+)
 
 data class CoursesUiState(
-    val studentTerms: List<TermUiState>,
-    val selectedTerm: MutableState<Int> = mutableStateOf(0)
+    val studentTerms: List<TermUiState>, val selectedTerm: MutableState<Int> = mutableStateOf(0)
 ) {
     val currentTerm get() = studentTerms[selectedTerm.value]
 }
@@ -99,11 +97,9 @@ data class UiSyllabus(
     val type: MutableState<SyllabusType> = mutableStateOf(SyllabusType.PointBased),
     val items: MutableState<List<UiSyllabusItem>> = mutableStateOf(listOf(UiSyllabusItem()))
 ) {
-    fun isValid(): Boolean =
-        (type.value == SyllabusType.WeightBased && items.value.sumOf {
-            it.percentage.value ?: 0
-        } == 100) ||
-                type.value == SyllabusType.PointBased
+    fun isValid(): Boolean = (type.value == SyllabusType.WeightBased && items.value.sumOf {
+        it.percentage.value ?: 0
+    } == 100) || type.value == SyllabusType.PointBased
 }
 
 data class UiSyllabusItem(
@@ -112,12 +108,10 @@ data class UiSyllabusItem(
 )
 
 data class SyllabusItem(
-    val name: String,
-    val percentage: Int
+    val name: String, val percentage: Int
 ) {
     fun toUiSyllabusItem() = UiSyllabusItem(
-        name = mutableStateOf(name),
-        percentage = mutableStateOf(percentage)
+        name = mutableStateOf(name), percentage = mutableStateOf(percentage)
     )
 }
 

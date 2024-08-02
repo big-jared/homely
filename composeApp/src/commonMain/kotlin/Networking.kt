@@ -6,10 +6,12 @@ import kotlinx.serialization.json.Json
 val client by lazy {
     HttpClient {
         install(ContentNegotiation) {
-            json(Json {
-                prettyPrint = true
-                isLenient = true
-            })
+            json(
+                Json {
+                    prettyPrint = true
+                    isLenient = true
+                }
+            )
         }
     }
 }

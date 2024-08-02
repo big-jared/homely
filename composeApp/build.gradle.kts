@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.detekt)
 }
 
 kotlin {
@@ -82,7 +83,7 @@ kotlin {
 }
 
 android {
-    namespace = "org.sodergutt.homely"
+    namespace = "org.theteam.homely"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
@@ -90,7 +91,7 @@ android {
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
-        applicationId = "org.sodergutt.homely"
+        applicationId = "org.theteam.homely"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -117,9 +118,11 @@ android {
         debugImplementation(compose.uiTooling)
     }
 }
+
 dependencies {
     implementation(libs.play.services.fitness)
     testImplementation(project(":shared"))
+    detektPlugins(libs.detekt.formatting)
 }
 
 compose.desktop {
@@ -128,7 +131,7 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "org.sodergutt.homely"
+            packageName = "org.theteam.homely"
             packageVersion = "1.0.0"
         }
     }
@@ -144,4 +147,8 @@ task("releaseWasm") {
             commandLine("mv", "$workingDir/build/dist/wasmJs/productionExecutable/*", "$workingDir/../docs")
         }
     }
+}
+
+detekt {
+    autoCorrect = true
 }

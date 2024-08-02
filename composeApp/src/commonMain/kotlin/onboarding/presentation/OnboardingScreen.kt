@@ -40,10 +40,12 @@ import onboarding.domain.OnboardingViewModel
 import onboarding.presentation.onboardingStep.OnboardingStep
 import org.koin.compose.koinInject
 
-
 sealed class OnboardingResult {
     data object Success : OnboardingResult()
-    class Failure(val title: String = "Unable to Continue", val message: String= "Unknown Error Occurred") :
+    class Failure(
+        val title: String = "Unable to Continue",
+        val message: String = "Unknown Error Occurred"
+    ) :
         OnboardingResult()
 }
 
@@ -71,19 +73,22 @@ class OnboardingScreen() : AuthenticatedScreen {
         if (isHorizontalLayout()) {
             Row {
                 AnimatedVisibility(activeStepIndex.value != 0) {
-                    Column(
-                        modifier = Modifier.fillMaxHeight().widthIn(max = 260.dp)
-                            .background(color = MaterialTheme.colorScheme.primary)
-                            .padding(top = 24.dp)
-                    ) {
-                        viewModel.steps.forEachIndexed { index, step ->
-                            StepRow(
-                                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
-                                    .padding(horizontal = 24.dp),
-                                step = step,
-                                active = index == activeStepIndex.value,
-                                viewModel = viewModel
-                            )
+                    Box {
+                        Column(
+                            modifier = Modifier.fillMaxHeight().widthIn(max = 400.dp)
+                                .align(Alignment.Center)
+                                .background(color = MaterialTheme.colorScheme.primary)
+                                .padding(top = 24.dp)
+                        ) {
+                            viewModel.steps.forEachIndexed { index, step ->
+                                StepRow(
+                                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                                        .padding(horizontal = 24.dp),
+                                    step = step,
+                                    active = index == activeStepIndex.value,
+                                    viewModel = viewModel
+                                )
+                            }
                         }
                     }
                 }
@@ -115,9 +120,12 @@ class OnboardingScreen() : AuthenticatedScreen {
                                     coScope.launch {
                                         viewModel.back()
                                     }
-                                })
+                                }
+                            )
                         }
-                        LazyRow(modifier = Modifier.heightIn(max = 144.dp).padding(start = 16.dp),) {
+                        LazyRow(
+                            modifier = Modifier.heightIn(max = 144.dp).padding(start = 16.dp),
+                        ) {
                             items(viewModel.steps.size - activeStepIndex.value) { index ->
                                 StepRow(
                                     modifier = Modifier.padding(end = 8.dp)

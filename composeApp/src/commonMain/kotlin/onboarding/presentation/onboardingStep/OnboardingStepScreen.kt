@@ -1,6 +1,5 @@
 package onboarding.presentation.onboardingStep
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -12,13 +11,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,21 +22,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import common.AppIconButton
 import common.BasicAlertDialog
 import kotlinx.coroutines.launch
 import onboarding.domain.OnboardingViewModel
 import onboarding.presentation.OnboardingResult
 import onboarding.presentation.isHorizontalLayout
 import org.koin.compose.koinInject
-
 
 abstract class OnboardingStep(val displayOnly: Boolean = false) : Screen {
     abstract val name: String
@@ -77,7 +70,9 @@ abstract class OnboardingStep(val displayOnly: Boolean = false) : Screen {
         Column(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.weight(1f).padding(horizontal = 20.dp)) {
                 Column(
-                    modifier = Modifier.align(if (isHorizontalLayout()) Alignment.Start else Alignment.CenterHorizontally)
+                    modifier = Modifier.align(
+                        if (isHorizontalLayout()) Alignment.Start else Alignment.CenterHorizontally
+                    )
                         .widthIn(max = 500.dp)
                         .verticalScroll(rememberScrollState())
                         .padding(top = 20.dp)
@@ -97,19 +92,22 @@ abstract class OnboardingStep(val displayOnly: Boolean = false) : Screen {
                     Spacer(modifier = Modifier.height(20.dp))
                 }
             }
-            Button(modifier = Modifier.fillMaxWidth()
-                .padding(16.dp)
-                .height(54.dp),
+            Button(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(16.dp)
+                    .height(54.dp),
                 enabled = canContinue(),
                 content = {
                     Text(text = if (onboardingViewModel.isLast()) "Finish" else "Continue")
-                }, onClick = {
+                },
+                onClick = {
                     coScope.launch {
                         continueToNextStep(navigator, onboardingViewModel) {
                             dialogState = it
                         }
                     }
-                })
+                }
+            )
             dialogState?.let {
                 BasicAlertDialog(it.title, it.message, onClose = {
                     dialogState = null

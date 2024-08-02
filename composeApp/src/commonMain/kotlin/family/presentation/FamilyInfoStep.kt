@@ -6,17 +6,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AddLocation
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.LocationOn
-import androidx.compose.material.icons.rounded.MyLocation
 import androidx.compose.material.icons.rounded.School
-import androidx.compose.material.icons.rounded.ShareLocation
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,7 +37,6 @@ import common.AppIconButton
 import common.ConfigurableInput
 import common.FullScreenProgressIndicator
 import common.HighlightBox
-import common.emptyState
 import family.data.StudentGrade
 import family.domain.FamilyInfoViewModel
 import family.domain.FamilyUiState
@@ -81,7 +81,8 @@ class FamilyInfo : OnboardingStep() {
             Column(modifier = Modifier.weight(.5f)) {
                 Text(text = "Family Name")
             }
-            OutlinedTextField(modifier = Modifier.padding(start = 16.dp).weight(.5f),
+            OutlinedTextField(
+                modifier = Modifier.padding(start = 16.dp).weight(.5f),
                 value = family.familyName.value,
                 onValueChange = { family.familyName.value = it },
                 shape = RoundedCornerShape(16.dp)
@@ -99,14 +100,19 @@ class FamilyInfo : OnboardingStep() {
                     Text("Why?")
                 }
             }
-            OutlinedTextField(modifier = Modifier.padding(start = 16.dp).weight(.5f),
+            OutlinedTextField(
+                modifier = Modifier.padding(start = 16.dp).weight(.5f),
                 value = family.city.value,
                 onValueChange = { family.city.value = it },
                 shape = RoundedCornerShape(16.dp),
                 trailingIcon = {
-                    AppIconButton(modifier = Modifier.size(32.dp), painter = rememberVectorPainter(Icons.Rounded.LocationOn), onClick = {
-                        family.city.value = "Boise"
-                    })
+                    AppIconButton(
+                        modifier = Modifier.size(32.dp),
+                        painter = rememberVectorPainter(Icons.Rounded.LocationOn),
+                        onClick = {
+                            family.city.value = "Boise"
+                        }
+                    )
                 }
             )
         }
@@ -115,7 +121,11 @@ class FamilyInfo : OnboardingStep() {
             Row(Modifier.weight(.5f)) {
                 Column(modifier = Modifier.align(Alignment.CenterVertically)) {
                     Text(text = "Holidays")
-                    Text(modifier = Modifier.padding(top = 8.dp), text = "Federal holidays are added by default", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Light))
+                    Text(
+                        modifier = Modifier.padding(top = 8.dp),
+                        text = "Federal holidays are added by default",
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Light)
+                    )
                 }
             }
             Button(modifier = Modifier.padding(start = 16.dp).weight(.5f), onClick = {
@@ -128,10 +138,11 @@ class FamilyInfo : OnboardingStep() {
 
     @Composable
     fun StudentTable(modifier: Modifier = Modifier, family: FamilyUiState) {
-        Column(Modifier.fillMaxWidth().padding(top = 24.dp)) {
+        Column(modifier.fillMaxWidth().padding(top = 24.dp)) {
             Row {
                 Text(
-                    modifier = Modifier.weight(1f).align(Alignment.CenterVertically).padding(top = 16.dp, start = 8.dp),
+                    modifier = Modifier.weight(1f).align(Alignment.CenterVertically)
+                        .padding(top = 16.dp, start = 8.dp),
                     text = "Students",
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium),
                 )
@@ -188,11 +199,13 @@ class FamilyInfo : OnboardingStep() {
                                 },
                                 onClick = {
                                     dialogShowing = true
-                                })
+                                }
+                            )
 
                             Box(modifier = Modifier.align(Alignment.CenterVertically)) {
                                 AppIconButton(
-                                    modifier = Modifier.align(Alignment.Center).padding(horizontal = 4.dp)
+                                    modifier = Modifier.align(Alignment.Center)
+                                        .padding(horizontal = 4.dp)
                                         .padding(end = 2.dp).size(28.dp),
                                     painter = rememberVectorPainter(Icons.Rounded.Close),
                                     containerColor = MaterialTheme.colorScheme.errorContainer.harmonize(

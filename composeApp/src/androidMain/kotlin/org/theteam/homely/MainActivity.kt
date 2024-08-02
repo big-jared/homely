@@ -1,4 +1,4 @@
-package org.sodergutt.homely
+package org.theteam.homely
 
 import application.presentation.App
 import android.os.Bundle

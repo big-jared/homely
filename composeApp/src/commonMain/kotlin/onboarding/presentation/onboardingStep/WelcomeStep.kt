@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
-import androidx.compose.material.icons.automirrored.rounded.ArrowRight
-import androidx.compose.material.icons.automirrored.rounded.ArrowRightAlt
-import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,7 +29,7 @@ import onboarding.domain.OnboardingViewModel
 import onboarding.presentation.OnboardingResult
 import org.koin.compose.koinInject
 
-class WelcomeStep: OnboardingStep(displayOnly = true) {
+class WelcomeStep : OnboardingStep(displayOnly = true) {
     override val name: String = "Welcome"
     override val contentCta = ""
 
@@ -44,9 +41,9 @@ class WelcomeStep: OnboardingStep(displayOnly = true) {
         val navigator = LocalNavigator.currentOrThrow
         val coScope = rememberCoroutineScope()
 
-        DarkTheme() {
+        DarkTheme {
             Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primary.darken(1.5f)) {
-                Box() {
+                Box {
                     Column(modifier = Modifier.align(Alignment.Center)) {
                         Text(
                             modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -66,7 +63,8 @@ class WelcomeStep: OnboardingStep(displayOnly = true) {
                                 }
                             },
                             modifier = Modifier.padding(vertical = 32.dp).padding(top = 64.dp).align(
-                                Alignment.CenterHorizontally)
+                                Alignment.CenterHorizontally
+                            )
                         ) {
                             Text(
                                 "Start Onboarding",

@@ -72,7 +72,6 @@ import course.domain.UiSyllabusItem
 import course.domain.defaultSyllabus
 import org.koin.compose.koinInject
 
-
 class AddCourseScreen(val course: CourseUiState = CourseUiState()) : Screen {
     private lateinit var viewModel: CoursesViewModel
 
@@ -113,18 +112,22 @@ class AddCourseScreen(val course: CourseUiState = CourseUiState()) : Screen {
             )
         ) {
             SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-                SegmentedButton(syllabus.type.value == SyllabusType.PointBased,
+                SegmentedButton(
+                    syllabus.type.value == SyllabusType.PointBased,
                     shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
                     onClick = { syllabus.type.value = SyllabusType.PointBased },
                     label = {
                         Text("Point Based")
-                    })
-                SegmentedButton(syllabus.type.value == SyllabusType.WeightBased,
+                    }
+                )
+                SegmentedButton(
+                    syllabus.type.value == SyllabusType.WeightBased,
                     onClick = { syllabus.type.value = SyllabusType.WeightBased },
                     shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
                     label = {
                         Text("Weight Based")
-                    })
+                    }
+                )
             }
 
             when (syllabus.type.value) {
@@ -149,9 +152,11 @@ class AddCourseScreen(val course: CourseUiState = CourseUiState()) : Screen {
 
                     FilledTonalButton(
                         modifier = Modifier.align(Alignment.CenterHorizontally)
-                            .padding(bottom = 8.dp), onClick = {
+                            .padding(bottom = 8.dp),
+                        onClick = {
                             course.syllabus.value = defaultSyllabus.toUiSyllabus()
-                        }) {
+                        }
+                    ) {
                         Text("Use defaults")
                     }
 
@@ -174,7 +179,8 @@ class AddCourseScreen(val course: CourseUiState = CourseUiState()) : Screen {
                                     value = syllabusItem.name.value,
                                     onValueChange = { syllabusItem.name.value = it },
                                     label = { Text("Category") },
-                                    placeholder = { Text("Homework") })
+                                    placeholder = { Text("Homework") }
+                                )
                                 val weight = syllabusItem.percentage.value
                                 OutlinedTextField(
                                     modifier = Modifier.padding(start = 16.dp)
@@ -252,9 +258,11 @@ class AddCourseScreen(val course: CourseUiState = CourseUiState()) : Screen {
             Column(modifier = Modifier.weight(.5f)) {
                 Text(text = "Class name")
             }
-            OutlinedTextField(modifier = Modifier.padding(start = 16.dp).weight(.5f),
+            OutlinedTextField(
+                modifier = Modifier.padding(start = 16.dp).weight(.5f),
                 value = course.courseName.value,
-                onValueChange = { course.courseName.value = it })
+                onValueChange = { course.courseName.value = it }
+            )
         }
     }
 
@@ -289,13 +297,22 @@ class AddCourseScreen(val course: CourseUiState = CourseUiState()) : Screen {
                 lightNavy
             ).forEach { color ->
                 val selected = course.color.value == color.toArgb()
-                ColorHintCircle(modifier = Modifier.size(animateDpAsState(if (selected) 84.dp else 64.dp).value)
-                    .then(if (selected) Modifier.onGloballyPositioned { layoutCoordinates ->
-                        itemPosition =
-                            layoutCoordinates.positionInRoot().x - layoutCoordinates.size.width
-                    } else Modifier).padding(8.dp).clip(CircleShape)
-                    .clickable { course.color.value = color.toArgb() }
-                    .align(Alignment.CenterVertically), color)
+                ColorHintCircle(
+                    modifier = Modifier.size(animateDpAsState(if (selected) 84.dp else 64.dp).value)
+                        .then(
+                            if (selected) {
+                                Modifier.onGloballyPositioned { layoutCoordinates ->
+                                    itemPosition =
+                                        layoutCoordinates.positionInRoot().x - layoutCoordinates.size.width
+                                }
+                            } else {
+                                Modifier
+                            }
+                        ).padding(8.dp).clip(CircleShape)
+                        .clickable { course.color.value = color.toArgb() }
+                        .align(Alignment.CenterVertically),
+                    color
+                )
             }
         }
     }

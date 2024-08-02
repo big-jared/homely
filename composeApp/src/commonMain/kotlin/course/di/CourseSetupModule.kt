@@ -1,8 +1,8 @@
 package course.di
 
 import course.data.CourseDataSource
-import course.data.SchoolingRepository
 import course.data.DemoCourseDataSource
+import course.data.SchoolingRepository
 import course.domain.CoursesViewModel
 import org.koin.dsl.module
 

@@ -1,13 +1,17 @@
 package course.data
 
-import family.data.Family
+import family.data.Course
+import family.data.Student
 import family.data.Term
 
 class SchoolingRepository(private val courseDataSource: CourseDataSource) {
-//    val students: ? get() = _currentFamily
-//    private var _currentStudents
-//
-//    suspend fun initialize(): List<Term> {
-//        return emptyList()
-//    }
+    val terms: Map<Student, Set<Course>> get() = _terms
+    private var _terms = mutableMapOf<Student, Set<Course>>()
+
+    suspend fun initialize(): List<Term> {
+        return emptyList()
+    }
+
+    suspend fun getCoursesForStudent(student: Student) {
+    }
 }

@@ -10,7 +10,7 @@ import course.domain.defaultSyllabus
 import family.data.Family
 import family.data.Student
 
-class DemoStateDataSource: StateDataSource {
+class DemoStateDataSource : StateDataSource {
 
     override suspend fun getRequiredCourses(family: Family, student: Student): List<Course> {
         return listOf(

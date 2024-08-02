@@ -50,7 +50,7 @@ enum class SubscriptionOption(
     )
 }
 
-class SubscriptionViewModel(private val subscriptionRepository: SubscriptionRepository): ScreenModel {
+class SubscriptionViewModel(private val subscriptionRepository: SubscriptionRepository) : ScreenModel {
     val options = listOf(SubscriptionOption.Simple, SubscriptionOption.Premium, SubscriptionOption.Elite)
     val selectedSubscription = MutableStateFlow<SubscriptionType?>(null)
 

@@ -1,7 +1,5 @@
 package course.data
 
-interface CourseDataSource {
+interface CourseDataSource
 
-}
-
-class DemoCourseDataSource: CourseDataSource
+class DemoCourseDataSource : CourseDataSource

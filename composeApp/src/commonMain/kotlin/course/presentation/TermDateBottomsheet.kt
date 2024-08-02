@@ -77,7 +77,8 @@ class TermDateBottomsheet(val termUiState: TermUiState) : Screen {
                     },
                     onClick = {
                         selectingStart = true
-                    })
+                    }
+                )
             }
             AnimatedVisibility(visible = selectingStart == true) {
                 Column {
@@ -97,8 +98,8 @@ class TermDateBottomsheet(val termUiState: TermUiState) : Screen {
                                     TimeZone.currentSystemDefault()
                                 ).date
                                 selectingStart = null
-                            }) {
-
+                            }
+                        ) {
                             Text(
                                 "Change to ${
                                     formatDate(
@@ -134,7 +135,8 @@ class TermDateBottomsheet(val termUiState: TermUiState) : Screen {
                     },
                     onClick = {
                         selectingStart = false
-                    })
+                    }
+                )
             }
             AnimatedVisibility(visible = selectingStart == false) {
                 Column {
@@ -154,7 +156,8 @@ class TermDateBottomsheet(val termUiState: TermUiState) : Screen {
                                     TimeZone.currentSystemDefault()
                                 ).date
                                 selectingStart = null
-                            }) {
+                            }
+                        ) {
                             Text(
                                 "Change to ${
                                     formatDate(
@@ -172,7 +175,6 @@ class TermDateBottomsheet(val termUiState: TermUiState) : Screen {
             }
 
             FilledTonalButton(onClick = {
-
             }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
                 Text("Save as family default")
             }

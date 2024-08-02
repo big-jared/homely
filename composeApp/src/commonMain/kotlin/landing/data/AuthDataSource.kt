@@ -10,17 +10,21 @@ interface AuthDataSource {
     suspend fun logout()
 }
 
-class AuthDataSourceProd(): AuthDataSource {
+class AuthDataSourceProd() : AuthDataSource {
     override suspend fun getLoggedInUser(): ParentUserRecord? {
         TODO("Not yet implemented")
     }
-    
-    override suspend fun login(loginRequest: LoginDto): ParentUserRecord? = client.post("http://localhost:8081/user/login") {
+
+    override suspend fun login(loginRequest: LoginDto): ParentUserRecord? = client.post(
+        "http://localhost:8081/user/login"
+    ) {
         contentType(ContentType.Application.Json)
         setBody(loginRequest)
     }.body<ParentUserRecord?>()
 
-    override suspend fun register(credentials: RegisterDto): ParentUserRecord? = client.post("http://localhost:8081/user/signup") {
+    override suspend fun register(credentials: RegisterDto): ParentUserRecord? = client.post(
+        "http://localhost:8081/user/signup"
+    ) {
         contentType(ContentType.Application.Json)
         setBody(credentials)
     }.body<ParentUserRecord?>()
@@ -30,16 +34,20 @@ class AuthDataSourceProd(): AuthDataSource {
     }
 }
 
-class AuthDataSourceDemo(isLoggedIn: Boolean = false): AuthDataSource {
-    private var loggedInUser = if (isLoggedIn) ParentUserRecord(
-        id = Random.nextInt(),
-        name = "Iamtest",
-        email = "lirundahusky@gmail.com",
-        authToken = Random.nextLong().toString()
-    ) else null
-    
+class AuthDataSourceDemo(isLoggedIn: Boolean = false) : AuthDataSource {
+    private var loggedInUser = if (isLoggedIn) {
+        ParentUserRecord(
+            id = Random.nextInt(),
+            name = "Iamtest",
+            email = "lirundahusky@gmail.com",
+            authToken = Random.nextLong().toString()
+        )
+    } else {
+        null
+    }
+
     override suspend fun getLoggedInUser(): ParentUserRecord? = loggedInUser
-    
+
     override suspend fun login(loginRequest: LoginDto): ParentUserRecord {
         return ParentUserRecord(
             id = Random.nextInt(),

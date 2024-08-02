@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.detekt)
 }
 
 kotlin {
@@ -45,7 +46,7 @@ kotlin {
 }
 
 android {
-    namespace = "org.sodergutt.homely.shared"
+    namespace = "org.theteam.homely.shared"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -54,4 +55,12 @@ android {
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
+}
+
+detekt {
+    autoCorrect = true
+}
+
+dependencies {
+    detektPlugins(libs.detekt.formatting)
 }

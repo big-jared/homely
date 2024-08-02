@@ -17,7 +17,9 @@ data class FamilyUiState(
         students = students.value.map { it.toStudent() }
     )
 
-    fun isValid() = familyName.value.isNotBlank() && city.value.isNotBlank() && students.value.all { it.isValid() } && students.value.isNotEmpty()
+    fun isValid() = familyName.value.isNotBlank() && city.value.isNotBlank() && students.value.all {
+        it.isValid()
+    } && students.value.isNotEmpty()
 }
 
 data class StudentInput(

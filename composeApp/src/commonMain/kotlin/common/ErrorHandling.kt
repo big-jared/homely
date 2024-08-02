@@ -24,10 +24,13 @@ fun GeneralFailureDialog(
         },
         confirmButton = {
             Box {
-                Button(modifier = Modifier.align(Alignment.Center)
-                    .padding(top = 24.dp), onClick = {
-                    onDismiss()
-                }) {
+                Button(
+                    modifier = Modifier.align(Alignment.Center)
+                        .padding(top = 24.dp),
+                    onClick = {
+                        onDismiss()
+                    }
+                ) {
                     Text(
                         "Ok",
                     )
@@ -43,4 +46,3 @@ fun GeneralFailureDialog(
         },
     )
 }
-

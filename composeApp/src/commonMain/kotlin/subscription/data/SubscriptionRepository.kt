@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class SubscriptionRepository(private val subscriptionDataSource: SubscriptionDataSource) {
-    val subscription : Flow<SubscriptionType?> get() = _subscription
-    private val _subscription  = MutableStateFlow<SubscriptionType?>(null)
+    val subscription: Flow<SubscriptionType?> get() = _subscription
+    private val _subscription = MutableStateFlow<SubscriptionType?>(null)
 
     suspend fun initSubscription() {
         _subscription.emit(subscriptionDataSource.getCurrentSubscription())
@@ -22,4 +22,3 @@ class SubscriptionRepository(private val subscriptionDataSource: SubscriptionDat
         _subscription.emit(null)
     }
 }
-

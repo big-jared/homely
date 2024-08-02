@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import onboarding.presentation.OnboardingResult
 
-
 class StateAndLegal : OnboardingStep() {
     override val name = "State Registration"
     override val contentCta = "Register with your state"

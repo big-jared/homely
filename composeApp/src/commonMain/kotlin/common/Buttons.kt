@@ -37,13 +37,13 @@ fun AppIconButton(
     ratio: Float = .6f
 ) {
     FilledTonalIconButton(
-        modifier = modifier, onClick = onClick,
+        modifier = modifier,
+        onClick = onClick,
         colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = containerColor)
     ) {
         Icon(modifier = Modifier.fillMaxSize(ratio), painter = painter, contentDescription = "", tint = contentColor)
     }
 }
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -75,9 +75,13 @@ fun HighlightBox(
         }
         text?.let {
             Text(
-                modifier = if (frontIcon == null) textModifier.padding(16.dp) else textModifier
-                    .padding(end = 12.dp)
-                    .align(Alignment.CenterVertically),
+                modifier = if (frontIcon == null) {
+                    textModifier.padding(16.dp)
+                } else {
+                    textModifier
+                        .padding(end = 12.dp)
+                        .align(Alignment.CenterVertically)
+                },
                 text = text,
                 color = mainColor,
                 style = textStyle

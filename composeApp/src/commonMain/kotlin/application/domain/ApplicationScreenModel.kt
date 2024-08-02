@@ -1,9 +1,7 @@
 package application.domain
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.Color
 import cafe.adriel.voyager.core.model.ScreenModel
-import com.materialkolor.PaletteStyle
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map

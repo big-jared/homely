@@ -6,8 +6,8 @@ import AuthDataSourceProd
 import application.domain.ApplicationTarget
 import application.domain.target
 import landing.data.AuthRepository
-import org.koin.dsl.module
 import landing.domain.AuthScreenModel
+import org.koin.dsl.module
 
 val authModule = module(true) {
     factory<AuthDataSource> {

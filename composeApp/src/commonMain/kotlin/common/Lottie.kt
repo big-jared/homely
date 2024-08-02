@@ -19,7 +19,7 @@ val emptyState = """
 fun Lottie(modifier: Modifier = Modifier, content: String, iterations: Int = Int.MAX_VALUE) {
 //    var lottieData by mutableStateOf<String?>(null)
 //    LaunchedEffect(Dispatchers.IO) {
-////        lottieData = Res.readBytes("files/$fileName").toString()
+// //        lottieData = Res.readBytes("files/$fileName").toString()
 //    }
 
 //    val lottie = lottieData ?: return

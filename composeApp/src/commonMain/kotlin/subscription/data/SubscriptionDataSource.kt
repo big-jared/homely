@@ -8,7 +8,7 @@ interface SubscriptionDataSource {
     suspend fun cancelSubscription()
 }
 
-class SubscriptionDataSourceProd(): SubscriptionDataSource {
+class SubscriptionDataSourceProd() : SubscriptionDataSource {
     override suspend fun getCurrentSubscription(): SubscriptionType {
         TODO("Not yet implemented")
     }
@@ -22,7 +22,7 @@ class SubscriptionDataSourceProd(): SubscriptionDataSource {
     }
 }
 
-class SubscriptionDataSourceDemo(): SubscriptionDataSource {
+class SubscriptionDataSourceDemo() : SubscriptionDataSource {
     private var currentSubscription: SubscriptionType? = null
 
     override suspend fun getCurrentSubscription(): SubscriptionType? = currentSubscription

@@ -57,7 +57,8 @@ fun BoxScope.SignInContent(state: SignInState, onSignUp: () -> Unit) {
         OutlinedTextField(
             value = state.emailInput.value,
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email, imeAction = ImeAction.Next
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next
             ),
             keyboardActions = KeyboardActions(onNext = {
                 focusManager.moveFocus(FocusDirection.Down)
@@ -67,12 +68,14 @@ fun BoxScope.SignInContent(state: SignInState, onSignUp: () -> Unit) {
             singleLine = true
         )
 
-        OutlinedTextField(modifier = Modifier.padding(top = 8.dp),
+        OutlinedTextField(
+            modifier = Modifier.padding(top = 8.dp),
             value = state.passwordInput.value,
             onValueChange = { state.passwordInput.value = it },
             visualTransformation = if (state.passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password, imeAction = ImeAction.Done
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(onDone = {
                 coScope.launch {
@@ -91,7 +94,8 @@ fun BoxScope.SignInContent(state: SignInState, onSignUp: () -> Unit) {
                 IconButton(onClick = { state.passwordVisible.value = !passwordVisible }) {
                     Icon(imageVector = image, description)
                 }
-            })
+            }
+        )
 
         TextButton(
             modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -111,7 +115,8 @@ fun BoxScope.SignInContent(state: SignInState, onSignUp: () -> Unit) {
         }
         TextButton(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            onClick = { onSignUp() }) {
+            onClick = { onSignUp() }
+        ) {
             Text("Sign Up")
         }
     }
@@ -131,10 +136,13 @@ private fun BoxScope.Dialogs(state: SignInState) {
             },
             confirmButton = {
                 AnimatedVisibility(forgotPasswordEmail.isNotEmpty()) {
-                    Button(modifier = Modifier.align(Alignment.Center)
-                        .padding(top = 24.dp), onClick = {
-                        state.forgotPassword.value = false
-                    }) {
+                    Button(
+                        modifier = Modifier.align(Alignment.Center)
+                            .padding(top = 24.dp),
+                        onClick = {
+                            state.forgotPassword.value = false
+                        }
+                    ) {
                         Text(
                             "Send reset link",
                         )
@@ -151,7 +159,8 @@ private fun BoxScope.Dialogs(state: SignInState) {
                     OutlinedTextField(
                         value = forgotPasswordEmail,
                         keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Email, imeAction = ImeAction.Done
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Done
                         ),
                         keyboardActions = KeyboardActions(onDone = {
                             focusManager.moveFocus(FocusDirection.Down)

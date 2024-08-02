@@ -2,11 +2,11 @@ package onboarding.domain
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import course.presentation.CoursesSetupStep
+import family.presentation.FamilyInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import onboarding.data.OnboardingRepository
 import onboarding.presentation.onboardingStep.Community
-import family.presentation.FamilyInfo
 import onboarding.presentation.onboardingStep.OnboardingStep
 import onboarding.presentation.onboardingStep.StateAndLegal
 import onboarding.presentation.onboardingStep.Subscription
@@ -26,7 +26,12 @@ class OnboardingViewModel(
     val initialized: StateFlow<Boolean> = _initialized
 
     val steps = listOf(
-        WelcomeStep(), FamilyInfo(), CoursesSetupStep(), StateAndLegal(), Community(), Subscription()
+        WelcomeStep(),
+        FamilyInfo(),
+        CoursesSetupStep(),
+        StateAndLegal(),
+        Community(),
+        Subscription()
     )
 
     fun first() = steps.first()

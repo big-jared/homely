@@ -56,14 +56,16 @@ fun BoxScope.SignUpContent(state: SignUpState, onSignIn: () -> Unit) {
 
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
-                    .padding(vertical = 16.dp), text = "OR"
+                    .padding(vertical = 16.dp),
+                text = "OR"
             )
 
             OutlinedTextField(
                 value = state.emailInput.value,
                 onValueChange = { state.emailInput.value = it },
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email, imeAction = ImeAction.Next
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(onNext = {
                     focusManager.moveFocus(FocusDirection.Down)
@@ -78,7 +80,8 @@ fun BoxScope.SignUpContent(state: SignUpState, onSignIn: () -> Unit) {
                 onValueChange = { state.passwordInput.value = it },
                 visualTransformation = if (state.passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password, imeAction = ImeAction.Next
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(onNext = {
                     focusManager.moveFocus(FocusDirection.Down)
@@ -103,7 +106,8 @@ fun BoxScope.SignUpContent(state: SignUpState, onSignIn: () -> Unit) {
                 onValueChange = { state.passwordRepeatInput.value = it },
                 visualTransformation = if (state.passwordRepeatVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password, imeAction = ImeAction.Next
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(onNext = {
                     focusManager.moveFocus(FocusDirection.Down)
@@ -144,8 +148,10 @@ fun BoxScope.SignUpContent(state: SignUpState, onSignIn: () -> Unit) {
             }) {
                 Text("Sign Up")
             }
-            TextButton(modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = { onSignIn() }) {
+            TextButton(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                onClick = { onSignIn() }
+            ) {
                 Text("Sign In")
             }
         }

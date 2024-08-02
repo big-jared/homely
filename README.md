@@ -1,41 +1,36 @@
 Home school application designed for parents
 
 Planned features:
-- Student setup, classes, gpas, content creation
+- Student setup, classes, GPAs, content creation, grading
 - State registration and legal support
-
-Targets: Android, iOS, Desktop, Wasm
-
-Foundation still in progress
-
-Building instructions:
-Wasm: ./gradlew wasmJsBrowserDevelopmentRun
-Desktop: ./gradlew :composeApp:run
 
 This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop, Server.
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
-
-* `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform, 
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
-
-* `/server` is for the Ktor server application.
-
-* `/shared` is for the code that will be shared between all targets in the project.
-  The most important subfolder is `commonMain`. If preferred, you can add code to the platform-specific folders here too.
-
-
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
+[Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
 [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+[Kotlin/Wasm](https://kotl.in/wasm/)
 
-**Note:** Compose/Web is Experimental and may be changed at any time. Use it only for evaluation purposes.
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
+Foundation still in progress
 
-You can open the web application by running the `:composeApp:wasmJsBrowserDevelopmentRun` Gradle task.
+[Designs](https://www.figma.com/design/d5sLjwLWIATF15Vwaf1hY8/homely-team-library?node-id=0-1&t=ct6DA2rb8WKBdMV0-1)
+
+* Building instructions:
+  - Wasm: ./gradlew wasmJsBrowserDevelopmentRun
+  - Desktop: ./gradlew :composeApp:run
+  - server: ./gradlew (currently [issue](https://youtrack.jetbrains.com/issue/KTOR-7054/NoSuchMethodError-when-using-coroutines-1.9.0-RC) with coroutines 1.9.0-RC)
+  - android: install an emulator, either run in AS / fleet or ./gradlew installDebug
+  - ios: install latest version of xcode, run using fleet, or configure in AS as noted [here](https://stackoverflow.com/questions/77851203/kotlin-multiplatform-library-iosapp-run-configuration)
+
+* Development:
+  - File Structure: featureGroup/di,data,domain,presentation,util/yourFile.kt
+  - Architecture: MVVM, Repository Pattern
+  - detekt (./gradlew detekt): static analysis / linting tool. https://github.com/detekt/detekt
+  - Navigation: Voyager https://voyager.adriel.cafe/
+  - UI: Material3 https://m3.material.io/components
+  - DI: Koin https://github.com/InsertKoinIO/koin/tree/main
+  - Networking: Ktor https://ktor.io/docs/client-create-new-application.html
+
+* Contributing:
+  - Pick up an issue documented in the issues panel!
+  - Any help is appreciated
+

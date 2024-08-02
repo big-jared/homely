@@ -35,7 +35,12 @@ fun BasicAlertDialog(title: String, message: String, buttonText: String = "Ok", 
 }
 
 @Composable
-fun AlertDialogWithContent(title: String? = null, buttonText: String = "Ok", onClose: () -> Unit, content: @Composable () -> Unit) {
+fun AlertDialogWithContent(
+    title: String? = null,
+    buttonText: String = "Ok",
+    onClose: () -> Unit,
+    content: @Composable () -> Unit
+) {
     AlertDialog(
         onDismissRequest = {
             onClose()
@@ -49,7 +54,9 @@ fun AlertDialogWithContent(title: String? = null, buttonText: String = "Ok", onC
         },
         modifier = Modifier,
         title = title?.let {
-            { Text(it) }
+            {
+                Text(it)
+            }
         },
         text = {
             content()

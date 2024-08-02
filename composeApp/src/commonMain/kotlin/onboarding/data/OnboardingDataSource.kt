@@ -5,7 +5,7 @@ interface OnboardingDataSource {
     suspend fun setComplete()
 }
 
-class DemoOnboardingDataSource: OnboardingDataSource {
+class DemoOnboardingDataSource : OnboardingDataSource {
     private var complete = false
 
     override suspend fun isCompleted(): Boolean = complete

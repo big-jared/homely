@@ -47,7 +47,6 @@ import onboarding.presentation.OnboardingResult
 import onboarding.presentation.onboardingStep.OnboardingStep
 import org.koin.compose.koinInject
 
-
 class CoursesSetupStep : OnboardingStep() {
     override val name = "Student Setup"
     override val contentCta = ""
@@ -102,7 +101,8 @@ class CoursesSetupStep : OnboardingStep() {
                                     },
                                     onClick = {
                                         bottomsheetNavigator.show(TermDateBottomsheet(currentTerm))
-                                    })
+                                    }
+                                )
                             } else {
                                 HighlightBox(
                                     modifier = Modifier.align(Alignment.CenterVertically)
@@ -119,7 +119,8 @@ class CoursesSetupStep : OnboardingStep() {
                                     },
                                     onClick = {
                                         bottomsheetNavigator.show(TermDateBottomsheet(currentTerm))
-                                    })
+                                    }
+                                )
                                 HighlightBox(
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                         .padding(horizontal = 2.dp, vertical = 8.dp),
@@ -135,7 +136,8 @@ class CoursesSetupStep : OnboardingStep() {
                                     },
                                     onClick = {
                                         bottomsheetNavigator.show(TermDateBottomsheet(currentTerm))
-                                    })
+                                    }
+                                )
                             }
                             Spacer(modifier = Modifier.width(4.dp))
                         }
@@ -231,7 +233,8 @@ class CoursesSetupStep : OnboardingStep() {
                 contentColor = MaterialTheme.colorScheme.error,
                 onClick = {
                     coursesViewModel.removeCourse(course)
-                })
+                }
+            )
         }
     }
 }

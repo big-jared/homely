@@ -15,6 +15,7 @@ class CoursesViewModel(
     val current get() = uiState.value?.currentTerm
 
     suspend fun initialize() {
+        schoolingRepository
         uiState.value = CoursesUiState(
             studentTerms = familyRepository.currentFamily?.students?.map { student ->
                 TermUiState(
@@ -50,9 +51,9 @@ class CoursesViewModel(
 
     fun isValid(): Boolean {
         val currentTerm = current ?: return false
-        return currentTerm.courses.value.all { it.isValid() }
-                && currentTerm.startDate.value != null
-                && currentTerm.endDate.value != null
-                && currentTerm.termName.value.isNotEmpty()
+        return currentTerm.courses.value.all { it.isValid() } &&
+            currentTerm.startDate.value != null &&
+            currentTerm.endDate.value != null &&
+            currentTerm.termName.value.isNotEmpty()
     }
 }
