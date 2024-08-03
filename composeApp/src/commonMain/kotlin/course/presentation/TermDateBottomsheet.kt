@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -15,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +28,7 @@ import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import common.HighlightBox
 import course.domain.TermUiState
 import kotlinx.datetime.Clock.System.now
@@ -40,19 +43,35 @@ fun formatDate(localDate: LocalDate): String {
     return if (localDate == now().toLocalDateTime(TimeZone.currentSystemDefault()).date) "Today" else "$month $day"
 }
 
-class TermDateBottomsheet(val termUiState: TermUiState) : Screen {
+class TermDateBottomsheet(val termUiState: TermUiState, val saveAsDefaults: () -> Unit): Screen {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
+        val navigator = LocalBottomSheetNavigator.current
         val initialStartMs =
-            termUiState.startDate.value?.let { it.toEpochDays() * 24L * 60 * 60 * 1000 }
+            termUiState.startDate.value?.let { (it.toEpochDays() + 1) * 24L * 60 * 60 * 1000 }
         val initialEndMs =
-            termUiState.startDate.value?.let { it.toEpochDays() * 24L * 60 * 60 * 1000 }
+            termUiState.endDate.value?.let { (it.toEpochDays() + 1) * 24L * 60 * 60 * 1000 }
 
-        val startDatePickerState =
-            rememberDatePickerState(initialSelectedDateMillis = initialStartMs)
+        val startDatePickerState = rememberDatePickerState(initialSelectedDateMillis = initialStartMs)
         val endDatePickerState = rememberDatePickerState(initialSelectedDateMillis = initialEndMs)
+
+        // When picker state changes, a recompose will happen. That recompose will trigger
+        // state to be updated, effecting the caller of this bottomsheet
+        run {
+            termUiState.startDate.value = Instant.fromEpochMilliseconds(
+                startDatePickerState.selectedDateMillis ?: return@run
+            ).toLocalDateTime(
+                TimeZone.currentSystemDefault()
+            ).date
+
+            termUiState.endDate.value = Instant.fromEpochMilliseconds(
+                endDatePickerState.selectedDateMillis ?: return@run
+            ).toLocalDateTime(
+                TimeZone.currentSystemDefault()
+            ).date
+        }
 
         var selectingStart by remember { mutableStateOf<Boolean?>(null) }
 
@@ -88,31 +107,6 @@ class TermDateBottomsheet(val termUiState: TermUiState) : Screen {
                         headline = null,
                         showModeToggle = false
                     )
-                    if (startDatePickerState.selectedDateMillis != null) {
-                        Button(
-                            modifier = Modifier.align(Alignment.CenterHorizontally).padding(8.dp),
-                            onClick = {
-                                termUiState.startDate.value = Instant.fromEpochMilliseconds(
-                                    startDatePickerState.selectedDateMillis ?: return@Button
-                                ).toLocalDateTime(
-                                    TimeZone.currentSystemDefault()
-                                ).date
-                                selectingStart = null
-                            }
-                        ) {
-                            Text(
-                                "Change to ${
-                                    formatDate(
-                                        Instant.fromEpochMilliseconds(
-                                            startDatePickerState.selectedDateMillis ?: return@Button
-                                        ).toLocalDateTime(
-                                            TimeZone.currentSystemDefault()
-                                        ).date
-                                    )
-                                }"
-                            )
-                        }
-                    }
                 }
             }
             Row {
@@ -146,35 +140,12 @@ class TermDateBottomsheet(val termUiState: TermUiState) : Screen {
                         headline = null,
                         showModeToggle = false
                     )
-                    if (endDatePickerState.selectedDateMillis != null) {
-                        Button(
-                            modifier = Modifier.align(Alignment.CenterHorizontally).padding(8.dp),
-                            onClick = {
-                                termUiState.endDate.value = Instant.fromEpochMilliseconds(
-                                    endDatePickerState.selectedDateMillis ?: return@Button
-                                ).toLocalDateTime(
-                                    TimeZone.currentSystemDefault()
-                                ).date
-                                selectingStart = null
-                            }
-                        ) {
-                            Text(
-                                "Change to ${
-                                    formatDate(
-                                        Instant.fromEpochMilliseconds(
-                                            endDatePickerState.selectedDateMillis ?: return@Button
-                                        ).toLocalDateTime(
-                                            TimeZone.currentSystemDefault()
-                                        ).date
-                                    )
-                                }"
-                            )
-                        }
-                    }
                 }
             }
 
             FilledTonalButton(onClick = {
+                saveAsDefaults()
+                navigator.hide()
             }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
                 Text("Save as family default")
             }

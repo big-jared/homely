@@ -168,23 +168,6 @@ fun FiraTypography() = Typography().run {
     )
 }
 
-abstract class HomelyScreen : Screen {
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
-        val applicationScreenModel = koinInject<ApplicationScreenModel>()
-
-        applicationScreenModel.isSignedIn.collectAsState(false)
-
-        Column(modifier = Modifier.fillMaxSize()) {
-            ScreenContent()
-        }
-    }
-
-    @Composable
-    abstract fun ColumnScope.ScreenContent()
-}
-
 @Composable
 fun DarkTheme(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     DynamicMaterialTheme(

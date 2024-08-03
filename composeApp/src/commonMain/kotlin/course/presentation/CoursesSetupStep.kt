@@ -100,7 +100,11 @@ class CoursesSetupStep : OnboardingStep() {
                                         )
                                     },
                                     onClick = {
-                                        bottomsheetNavigator.show(TermDateBottomsheet(currentTerm))
+                                        bottomsheetNavigator.show(TermDateBottomsheet(currentTerm) {
+                                            coScope.launch {
+                                                coursesViewModel.setDefaultDates()
+                                            }
+                                        })
                                     }
                                 )
                             } else {
@@ -118,7 +122,11 @@ class CoursesSetupStep : OnboardingStep() {
                                         )
                                     },
                                     onClick = {
-                                        bottomsheetNavigator.show(TermDateBottomsheet(currentTerm))
+                                        bottomsheetNavigator.show(TermDateBottomsheet(currentTerm) {
+                                            coScope.launch {
+                                                coursesViewModel.setDefaultDates()
+                                            }
+                                        })
                                     }
                                 )
                                 HighlightBox(
@@ -135,7 +143,11 @@ class CoursesSetupStep : OnboardingStep() {
                                         )
                                     },
                                     onClick = {
-                                        bottomsheetNavigator.show(TermDateBottomsheet(currentTerm))
+                                        bottomsheetNavigator.show(TermDateBottomsheet(termUiState = currentTerm) {
+                                            coScope.launch {
+                                                coursesViewModel.setDefaultDates()
+                                            }
+                                        })
                                     }
                                 )
                             }
@@ -152,12 +164,11 @@ class CoursesSetupStep : OnboardingStep() {
                 )
                 Box(modifier = Modifier.weight(1f)) {
                     AppIconButton(modifier = Modifier.align(Alignment.CenterEnd), onClick = {
-                        bottomsheetNavigator.show(AddCourseScreen(course = CourseUiState()))
+                        bottomsheetNavigator.show(CourseDetailsScreen())
                     })
                 }
             }
-
-            if (coursesViewModel.current?.courses?.value.isNullOrEmpty()) {
+            if (coursesViewModel.currentTerm?.courses?.value.isNullOrEmpty()) {
                 FilledTonalButton(
                     modifier = Modifier.padding(top = 16.dp).align(Alignment.CenterHorizontally),
                     onClick = {
@@ -172,8 +183,7 @@ class CoursesSetupStep : OnboardingStep() {
                     )
                 }
             }
-
-            CoursesTable(term = coursesViewModel.current ?: return)
+            CoursesTable(term = coursesViewModel.currentTerm ?: return)
         } ?: run {
             FullScreenProgressIndicator()
         }
@@ -201,7 +211,7 @@ class CoursesSetupStep : OnboardingStep() {
                 Text(
                     modifier = Modifier.align(Alignment.CenterHorizontally).padding(8.dp),
                     textAlign = TextAlign.Center,
-                    text = "Later we will help you to add or generate course content and schedules for ${coursesViewModel.current?.student?.name}",
+                    text = "Later we will help you to add or generate course content and schedules for ${coursesViewModel.currentTerm?.student?.name}",
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Thin)
                 )
             }
@@ -216,7 +226,7 @@ class CoursesSetupStep : OnboardingStep() {
 
         Row(
             modifier = modifier.fillMaxWidth().clickable {
-                navigator.show(AddCourseScreen(course))
+                navigator.show(CourseDetailsScreen(course))
             }
         ) {
             Box(

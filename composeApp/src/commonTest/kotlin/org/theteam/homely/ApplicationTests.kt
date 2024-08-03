@@ -1,4 +1,4 @@
-package org.sodergutt.homely
+package org.theteam.homely
 
 import AuthDataSource
 import AuthDataSourceDemo

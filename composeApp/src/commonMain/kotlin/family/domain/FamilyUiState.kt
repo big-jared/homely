@@ -5,16 +5,21 @@ import androidx.compose.runtime.mutableStateOf
 import family.data.Family
 import family.data.Student
 import family.data.StudentGrade
+import kotlinx.datetime.LocalDate
 
 data class FamilyUiState(
     var familyName: MutableState<String> = mutableStateOf(""),
     var city: MutableState<String> = mutableStateOf(""),
-    var students: MutableState<List<StudentInput>> = mutableStateOf(listOf(StudentInput()))
+    var students: MutableState<List<StudentInput>> = mutableStateOf(listOf(StudentInput())),
+    val defaultStart: LocalDate? = null,
+    val defaultEnd: LocalDate? = null,
 ) {
     fun toFamily(): Family = Family(
         familyName = familyName.value,
         city = city.value,
-        students = students.value.map { it.toStudent() }
+        students = students.value.map { it.toStudent() },
+        defaultStart = defaultStart,
+        defaultEnd = defaultEnd
     )
 
     fun isValid() = familyName.value.isNotBlank() && city.value.isNotBlank() && students.value.all {

@@ -55,7 +55,6 @@ class FamilyInfo : OnboardingStep() {
 
     @Composable
     override fun ColumnScope.OnboardingContent() {
-        val bottomSheetNavigator = LocalBottomSheetNavigator.current
         familyViewModel = koinInject()
 
         LaunchedEffect(null) {

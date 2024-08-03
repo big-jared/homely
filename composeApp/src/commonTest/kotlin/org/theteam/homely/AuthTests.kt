@@ -1,11 +1,11 @@
-package org.sodergutt.homely
+package org.theteam.homely
 
 import kotlinx.coroutines.test.runTest
-import org.koin.test.KoinTest
 import kotlin.test.Test
 import AuthDataSource
 import AuthDataSourceDemo
 import app.cash.turbine.test
+import landing.data.AuthRepository
 import landing.domain.AuthScreenModel
 import landing.domain.SignInError
 import landing.domain.SignUpError

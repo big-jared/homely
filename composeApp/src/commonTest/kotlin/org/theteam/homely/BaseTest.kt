@@ -1,4 +1,4 @@
-package org.sodergutt.homely
+package org.theteam.homely
 
 import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest

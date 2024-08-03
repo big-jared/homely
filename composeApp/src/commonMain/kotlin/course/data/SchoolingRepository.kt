@@ -12,6 +12,8 @@ class SchoolingRepository(private val courseDataSource: CourseDataSource) {
         return emptyList()
     }
 
-    suspend fun getCoursesForStudent(student: Student) {
+    suspend fun getTermForStudent(student: Student) {
     }
+
+    suspend fun 
 }

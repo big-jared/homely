@@ -21,7 +21,7 @@ fun ConfigurableInput(
     trailing: (@Composable () -> Unit)? = null
 ) {
     OutlinedTextField(
-        modifier = Modifier.padding().fillMaxWidth(),
+        modifier = modifier.padding().fillMaxWidth(),
         value = text,
         label = { Text(label) },
         onValueChange = { onTextChange(it) },

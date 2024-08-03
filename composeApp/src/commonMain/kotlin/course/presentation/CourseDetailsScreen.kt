@@ -72,7 +72,7 @@ import course.domain.UiSyllabusItem
 import course.domain.defaultSyllabus
 import org.koin.compose.koinInject
 
-class AddCourseScreen(val course: CourseUiState = CourseUiState()) : Screen {
+class CourseDetailsScreen(val course: CourseUiState = CourseUiState(isNew = true)) : Screen {
     private lateinit var viewModel: CoursesViewModel
 
     @Composable
@@ -86,15 +86,17 @@ class AddCourseScreen(val course: CourseUiState = CourseUiState()) : Screen {
             ColorRow()
             SyllabusTable(horizontalModifier)
 
-            Button(
-                modifier = Modifier.fillMaxWidth().padding(16.dp).height(56.dp),
-                onClick = {
-                    viewModel.addCourse(course)
-                    navigator.hide()
-                },
-                enabled = course.isValid()
-            ) {
-                Text("Create")
+            if (course.isNew) {
+                Button(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp).height(56.dp),
+                    onClick = {
+                        viewModel.addCourse(course)
+                        navigator.hide()
+                    },
+                    enabled = course.isValid()
+                ) {
+                    Text("Create")
+                }
             }
             Spacer(modifier = Modifier.height(20.dp))
         }
@@ -242,7 +244,7 @@ class AddCourseScreen(val course: CourseUiState = CourseUiState()) : Screen {
         Row(modifier = modifier.padding(top = 16.dp)) {
             Text(
                 modifier = Modifier.weight(1f).align(Alignment.CenterVertically),
-                text = "Add Class",
+                text = if (course.isNew) "Add Class" else "Edit Class",
                 style = MaterialTheme.typography.headlineSmall,
             )
 

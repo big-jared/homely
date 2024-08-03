@@ -45,8 +45,7 @@ sealed class OnboardingResult {
     class Failure(
         val title: String = "Unable to Continue",
         val message: String = "Unknown Error Occurred"
-    ) :
-        OnboardingResult()
+    ) : OnboardingResult()
 }
 
 class OnboardingScreen() : AuthenticatedScreen {
