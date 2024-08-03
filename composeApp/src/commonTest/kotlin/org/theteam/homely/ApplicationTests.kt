@@ -5,6 +5,7 @@ import AuthDataSourceDemo
 import app.cash.turbine.test
 import application.domain.ApplicationScreenModel
 import kotlinx.coroutines.test.runTest
+import landing.data.AuthRepository
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import org.koin.test.KoinTest

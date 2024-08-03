@@ -1,19 +1,24 @@
 package course.data
 
-import family.data.Course
+import family.data.FamilyRepository
 import family.data.Student
-import family.data.Term
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class SchoolingRepository(private val courseDataSource: CourseDataSource) {
-    val terms: Map<Student, Set<Course>> get() = _terms
-    private var _terms = mutableMapOf<Student, Set<Course>>()
+class SchoolingRepository(private val courseDataSource: CourseDataSource): KoinComponent {
+    // Just using this to get the students
+    private val familyRepository by inject<FamilyRepository>()
 
-    suspend fun initialize(): List<Term> {
-        return emptyList()
+    val terms: Map<Student, Set<Term>> get() = _terms
+    private var _terms = mutableMapOf<Student, Set<Term>>()
+
+    suspend fun initialize() {
+        _terms = familyRepository.currentFamily?.students?.associateWith {
+            courseDataSource.getTermsForStudent(it)
+        }?.toMutableMap() ?: mutableMapOf()
     }
 
-    suspend fun getTermForStudent(student: Student) {
+    suspend fun updateTerm(student: Student, term: Term) {
+        courseDataSource.setTermForStudent(term, student)
     }
-
-    suspend fun 
 }

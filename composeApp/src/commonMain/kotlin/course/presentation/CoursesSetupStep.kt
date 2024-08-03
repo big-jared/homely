@@ -40,7 +40,7 @@ import common.ConfigurableInput
 import common.FullScreenProgressIndicator
 import common.HighlightBox
 import course.domain.CourseUiState
-import course.domain.CoursesViewModel
+import course.domain.CourseSetupViewModel
 import course.domain.TermUiState
 import kotlinx.coroutines.launch
 import onboarding.presentation.OnboardingResult
@@ -50,7 +50,7 @@ import org.koin.compose.koinInject
 class CoursesSetupStep : OnboardingStep() {
     override val name = "Student Setup"
     override val contentCta = ""
-    lateinit var coursesViewModel: CoursesViewModel
+    lateinit var coursesViewModel: CourseSetupViewModel
 
     override suspend fun evaluateContinue(): OnboardingResult {
         return OnboardingResult.Success
@@ -61,7 +61,7 @@ class CoursesSetupStep : OnboardingStep() {
     @Composable
     override fun ColumnScope.OnboardingContent() {
         coursesViewModel = koinInject()
-        val uiState = coursesViewModel.uiState.collectAsState()
+        val uiState = coursesViewModel.uiTerms.collectAsState()
         val coScope = rememberCoroutineScope()
         val bottomsheetNavigator = LocalBottomSheetNavigator.current
 
@@ -221,7 +221,7 @@ class CoursesSetupStep : OnboardingStep() {
     @OptIn(ExperimentalLayoutApi::class)
     @Composable
     fun CourseRow(modifier: Modifier = Modifier, course: CourseUiState) {
-        val coursesViewModel: CoursesViewModel = koinInject()
+        val coursesViewModel: CourseSetupViewModel = koinInject()
         val navigator = LocalBottomSheetNavigator.current
 
         Row(

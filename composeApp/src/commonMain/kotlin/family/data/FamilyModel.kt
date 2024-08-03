@@ -1,10 +1,8 @@
 package family.data
 
 import androidx.compose.runtime.mutableStateOf
-import course.data.Term
 import family.domain.FamilyUiState
 import family.domain.StudentInput
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 
 data class Family(
@@ -26,8 +24,6 @@ data class Family(
 data class Student(
     val name: String,
     val grade: StudentGrade,
-    val allTerms: List<Term>? = null,
-    val activeTerm: Term? = null,
 ) {
     fun toStudentInput() = StudentInput(
         name = mutableStateOf(name),

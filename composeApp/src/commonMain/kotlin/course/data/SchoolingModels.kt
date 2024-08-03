@@ -2,6 +2,7 @@ package course.data
 
 import androidx.compose.runtime.mutableStateOf
 import course.domain.CourseUiState
+import course.domain.TermUiState
 import course.domain.UiSyllabus
 import course.domain.UiSyllabusItem
 import family.data.CourseGrade
@@ -12,10 +13,20 @@ import kotlin.time.Duration
 
 data class Term(
     val name: String,
-    val courses: List<Course>,
+    val courses: Set<Course>,
     val startDate: LocalDate?,
-    val endDate: LocalDate?
-)
+    val endDate: LocalDate?,
+    val active: Boolean = true,
+) {
+    fun gpa(): String = "TODO"
+
+    fun toTermUiState() = TermUiState(
+        termName = mutableStateOf(name),
+        courses = mutableStateOf(courses.map { it.toCourseUiState() }),
+        startDate = mutableStateOf(startDate),
+        endDate = mutableStateOf(endDate),
+    )
+}
 
 data class Course(
     val name: String,
@@ -26,6 +37,7 @@ data class Course(
     val time: LocalTime? = null,
     val duration: Duration? = null,
     val interval: ClassInterval,
+    val gradeScale: GradeScale,
 ) {
     fun toCourseUiState() = CourseUiState(
         courseName = mutableStateOf(name),
@@ -68,6 +80,12 @@ data class ClassInterval(
 ) {
     fun workingDays(): String {
         return "${if (monday) "M" else ""},${if (tuesday) "T" else ""},${if (wednesday) "W" else ""},${if (thursday) "Th" else ""},${if (friday) "F" else ""},${if (saturday) "S" else ""},${if (sunday) "Su" else ""}"
+    }
+
+    companion object {
+        fun weekDays(): ClassInterval = ClassInterval(
+            monday = true, tuesday = true, wednesday = true, thursday = true, friday = true, saturday = false, sunday = false
+        )
     }
 }
 

@@ -5,39 +5,56 @@ import common.blue
 import common.green
 import common.purple
 import common.red
-import course.domain.Course
+import course.data.ClassInterval
+import course.data.Course
+import course.data.defaultGradeScale
 import course.domain.defaultSyllabus
 import family.data.Family
 import family.data.Student
 
 class DemoStateDataSource : StateDataSource {
 
-    override suspend fun getRequiredCourses(family: Family, student: Student): List<Course> {
-        return listOf(
-            Course(
-                "Math",
-                defaultSyllabus,
-                red.toArgb()
-            ),
-            Course(
-                "English",
-                defaultSyllabus,
-                blue.toArgb()
-            ),
-            Course(
-                "Science",
-                defaultSyllabus,
-                green.toArgb()
-            ),
-            Course(
-                "Physical Education",
-                defaultSyllabus,
-                purple.toArgb()
-            ),
-        )
+    // TODO replace Family with location once location work is started
+    override suspend fun getRequiredCourses(family: Family, student: Student): Set<Course> {
+        return demoCourses
     }
 }
 
+val demoCourses = setOf(
+    Course(
+        name = "Math",
+        syllabus = defaultSyllabus,
+        color = red.toArgb(),
+        interval = ClassInterval.weekDays(),
+        gradeScale = defaultGradeScale(),
+        assignments = emptyList(),
+    ),
+    Course(
+        name = "English",
+        syllabus = defaultSyllabus,
+        color = blue.toArgb(),
+        interval = ClassInterval.weekDays(),
+        gradeScale = defaultGradeScale(),
+        assignments = emptyList(),
+    ),
+    Course(
+        name = "Science",
+        syllabus = defaultSyllabus,
+        color = green.toArgb(),
+        interval = ClassInterval.weekDays(),
+        gradeScale = defaultGradeScale(),
+        assignments = emptyList(),
+    ),
+    Course(
+        name = "Physical Education",
+        syllabus = defaultSyllabus,
+        color = purple.toArgb(),
+        interval = ClassInterval.weekDays(),
+        gradeScale = defaultGradeScale(),
+        assignments = emptyList(),
+    ),
+)
+
 interface StateDataSource {
-    suspend fun getRequiredCourses(family: Family, student: Student): List<Course>
+    suspend fun getRequiredCourses(family: Family, student: Student): Set<Course>
 }

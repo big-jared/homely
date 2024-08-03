@@ -118,7 +118,6 @@ interface AuthenticatedScreen : Screen {
     fun ScreenContent()
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun FiraFontFamily() = FontFamily(
     Font(Res.font.firacode_light, FontWeight.Light),

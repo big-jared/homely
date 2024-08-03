@@ -1,6 +1,6 @@
 package state.data
 
-import course.domain.Course
+import course.data.Course
 import family.data.Family
 import family.data.Student
 

@@ -66,14 +66,14 @@ import common.purple
 import common.red
 import common.yellow
 import course.domain.CourseUiState
-import course.domain.CoursesViewModel
+import course.domain.CourseSetupViewModel
 import course.domain.SyllabusType
 import course.domain.UiSyllabusItem
 import course.domain.defaultSyllabus
 import org.koin.compose.koinInject
 
 class CourseDetailsScreen(val course: CourseUiState = CourseUiState(isNew = true)) : Screen {
-    private lateinit var viewModel: CoursesViewModel
+    private lateinit var viewModel: CourseSetupViewModel
 
     @Composable
     override fun Content() {

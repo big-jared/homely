@@ -6,18 +6,18 @@ import androidx.compose.ui.graphics.toArgb
 import common.red
 import course.data.ClassInterval
 import course.data.Course
+import course.data.GradeScale
 import course.data.Syllabus
 import course.data.SyllabusItem
 import course.data.SyllabusType
 import course.data.Term
+import course.data.defaultGradeScale
 import family.data.Student
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.hours
 
 data class TermUiState(
-    val student: Student,
     val termName: MutableState<String> = mutableStateOf("${student.grade.name} Grade"),
     val startDate: MutableState<LocalDate?> = mutableStateOf(null),
     val endDate: MutableState<LocalDate?> = mutableStateOf(null),
@@ -32,14 +32,15 @@ data class TermUiState(
         name = termName.value,
         startDate = startDate.value ,
         endDate = startDate.value,
-        courses = courses.value.map { it.toCourse() }
+        courses = courses.value.map { it.toCourse() }.toSet(),
     )
 }
 
-data class CoursesUiState(
-    val studentTerms: List<TermUiState>, val selectedTerm: MutableState<Int> = mutableStateOf(0)
+data class SchoolingUiState(
+    val student: Student,
+    val uiTerm: TermUiState
 ) {
-    val currentTerm get() = studentTerms[selectedTerm.value]
+    fun isValid() = uiTerm.isValid()
 }
 
 data class UiClassInterval(
@@ -74,6 +75,7 @@ data class CourseUiState(
     val interval: MutableState<UiClassInterval> = mutableStateOf(UiClassInterval()),
     val color: MutableState<Int> = mutableStateOf(red.toArgb()),
     val syllabus: MutableState<UiSyllabus> = mutableStateOf(UiSyllabus()),
+    val gradeScale: MutableState<GradeScale> = mutableStateOf(defaultGradeScale()),
     val isNew: Boolean = false
 ) {
     fun isValid(): Boolean {
@@ -88,7 +90,8 @@ data class CourseUiState(
         interval = interval.value.toInterval(),
         color = color.value,
         syllabus = syllabus.value.toSyllabus(),
-        assignments = emptyList()
+        assignments = emptyList(),
+        gradeScale = gradeScale.value
     )
 }
 
