@@ -1,5 +1,6 @@
 package course.domain
 
+import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
 import course.data.SchoolingRepository
 import course.data.Term
@@ -13,7 +14,8 @@ import state.data.StateRepository
 fun Map<Student, Set<Term>>.toCoursesUiState() = this.map { (student, terms) ->
     SchoolingUiState(
         student = student,
-        uiTerm = terms.firstOrNull { it.active }?.toTermUiState() ?: TermUiState()
+        uiTerm = terms.firstOrNull { it.active }?.toTermUiState()
+            ?: TermUiState(termName = MutableStateFlow("${student.grade.name} Grade"))
     )
 }
 
@@ -22,21 +24,27 @@ class CourseSetupViewModel(
     private val schoolingRepository: SchoolingRepository,
     private val stateRepository: StateRepository
 ) : ScreenModel {
-    val uiTerms = MutableStateFlow<List<SchoolingUiState>?>(null)
+    private val schoolingUiState = MutableStateFlow<List<SchoolingUiState>?>(null)
 
     // In the future currentStudentIndex could be saved to a datasource so that
     // A user can pick up where they left off
     private val currentStudentIndex = MutableStateFlow(0)
-    val currentTermState = combine(uiTerms, currentStudentIndex) { uiState, currentStudent ->
+    val currentTermState = combine(schoolingUiState, currentStudentIndex) { uiState, currentStudent ->
         if (uiState == null) return@combine null
         uiState[currentStudent]
     }
 
-    val currentTerm get() = uiTerms.value?.get(currentStudentIndex.value)
+    val nextTerm = combine(schoolingUiState, currentStudentIndex) { uiState, currentStudent ->
+        if (uiState == null) return@combine null
+        if (currentStudent >= uiState.size) return@combine null
+        uiState[currentStudent + 1]
+    }
+
+    val currentTerm get() = schoolingUiState.value?.get(currentStudentIndex.value)
 
     suspend fun initialize() {
         schoolingRepository.initialize()
-        uiTerms.value = schoolingRepository.terms.toCoursesUiState()
+        schoolingUiState.value = schoolingRepository.terms.toCoursesUiState()
     }
 
     suspend fun update(): OnboardingResult {
@@ -83,6 +91,4 @@ class CourseSetupViewModel(
             remove(course)
         }
     }
-
-    fun isValid() = uiTerms.value?.all { it.isValid() } == true
 }

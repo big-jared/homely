@@ -24,7 +24,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,12 +58,11 @@ class CoursesSetupStep : OnboardingStep() {
         return OnboardingResult.Success
     }
 
-    override fun canContinue() = coursesViewModel.isValid()
-
     @Composable
     override fun ColumnScope.OnboardingContent() {
         coursesViewModel = koinInject()
-        val uiState = coursesViewModel.uiTerms.collectAsState()
+        val currentTerm = coursesViewModel.currentTermState.collectAsState(null)
+        val nextTerm = coursesViewModel.nextTerm.collectAsState(null)
         val coScope = rememberCoroutineScope()
         val bottomsheetNavigator = LocalBottomSheetNavigator.current
 
@@ -69,23 +70,24 @@ class CoursesSetupStep : OnboardingStep() {
             coursesViewModel.initialize()
         }
 
-        uiState.value?.let { state ->
-            val currentTerm = state.studentTerms[state.selectedTerm.value]
+        currentTerm.value?.uiTerm?.let { term ->
+            canContinue.value = term.isValid().collectAsState(true).value
+            continueSuffix.value = " to " + nextTerm.value?.student?.name
             Text(
-                text = "Lets get ${currentTerm.student.name} set up!",
+                text = "Lets get ${currentTerm.value?.student?.name} set up!",
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium),
             )
 
             Row(modifier = Modifier.padding(top = 24.dp)) {
                 ConfigurableInput(
-                    text = currentTerm.termName.value,
+                    text = term.termName.value,
                     label = "Term",
                     onTextChange = {
-                        currentTerm.termName.value = it
+                        term.termName.value = it
                     },
                     trailing = {
                         Row {
-                            if (currentTerm.startDate.value == null) {
+                            if (term.startDate.value == null) {
                                 HighlightBox(
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                         .padding(horizontal = 2.dp, vertical = 8.dp),
@@ -100,7 +102,7 @@ class CoursesSetupStep : OnboardingStep() {
                                         )
                                     },
                                     onClick = {
-                                        bottomsheetNavigator.show(TermDateBottomsheet(currentTerm) {
+                                        bottomsheetNavigator.show(TermDateBottomsheet(term) {
                                             coScope.launch {
                                                 coursesViewModel.setDefaultDates()
                                             }
@@ -111,7 +113,7 @@ class CoursesSetupStep : OnboardingStep() {
                                 HighlightBox(
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                         .padding(horizontal = 2.dp, vertical = 8.dp),
-                                    text = currentTerm.startDate.value?.let { formatDate(it) },
+                                    text = term.startDate.value?.let { formatDate(it) },
                                     color = MaterialTheme.colorScheme.primary,
                                     backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
                                     frontIcon = {
@@ -122,7 +124,7 @@ class CoursesSetupStep : OnboardingStep() {
                                         )
                                     },
                                     onClick = {
-                                        bottomsheetNavigator.show(TermDateBottomsheet(currentTerm) {
+                                        bottomsheetNavigator.show(TermDateBottomsheet(term) {
                                             coScope.launch {
                                                 coursesViewModel.setDefaultDates()
                                             }
@@ -132,7 +134,7 @@ class CoursesSetupStep : OnboardingStep() {
                                 HighlightBox(
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                         .padding(horizontal = 2.dp, vertical = 8.dp),
-                                    text = currentTerm.endDate.value?.let { formatDate(it) },
+                                    text = term.endDate.value?.let { formatDate(it) },
                                     color = MaterialTheme.colorScheme.primary,
                                     backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
                                     frontIcon = {
@@ -143,7 +145,7 @@ class CoursesSetupStep : OnboardingStep() {
                                         )
                                     },
                                     onClick = {
-                                        bottomsheetNavigator.show(TermDateBottomsheet(termUiState = currentTerm) {
+                                        bottomsheetNavigator.show(TermDateBottomsheet(termUiState = term) {
                                             coScope.launch {
                                                 coursesViewModel.setDefaultDates()
                                             }
@@ -168,7 +170,7 @@ class CoursesSetupStep : OnboardingStep() {
                     })
                 }
             }
-            if (coursesViewModel.currentTerm?.courses?.value.isNullOrEmpty()) {
+            if (term.courses.value.isEmpty()) {
                 FilledTonalButton(
                     modifier = Modifier.padding(top = 16.dp).align(Alignment.CenterHorizontally),
                     onClick = {
@@ -183,7 +185,7 @@ class CoursesSetupStep : OnboardingStep() {
                     )
                 }
             }
-            CoursesTable(term = coursesViewModel.currentTerm ?: return)
+            CoursesTable(term = term)
         } ?: run {
             FullScreenProgressIndicator()
         }

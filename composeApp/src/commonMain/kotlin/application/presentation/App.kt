@@ -1,7 +1,5 @@
 package application.presentation
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
@@ -9,7 +7,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Typography
 import androidx.compose.material3.lightColorScheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
@@ -29,13 +29,16 @@ import com.materialkolor.ktx.darken
 import common.FullScreenProgressIndicator
 import course.di.coursesModule
 import family.di.familyModule
-import homely.composeapp.generated.resources.*
+import homely.composeapp.generated.resources.Res
+import homely.composeapp.generated.resources.firacode_bold
+import homely.composeapp.generated.resources.firacode_light
+import homely.composeapp.generated.resources.firacode_medium
+import homely.composeapp.generated.resources.firacode_retina
 import kotlinx.coroutines.flow.collectLatest
 import landing.di.authModule
 import landing.presentation.LandingScreen
 import onboarding.di.onboardingModule
 import onboarding.presentation.OnboardingScreen
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinApplication

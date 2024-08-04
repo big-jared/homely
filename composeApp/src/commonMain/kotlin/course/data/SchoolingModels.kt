@@ -1,11 +1,11 @@
 package course.data
 
-import androidx.compose.runtime.mutableStateOf
 import course.domain.CourseUiState
 import course.domain.TermUiState
 import course.domain.UiSyllabus
 import course.domain.UiSyllabusItem
 import family.data.CourseGrade
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
@@ -21,10 +21,10 @@ data class Term(
     fun gpa(): String = "TODO"
 
     fun toTermUiState() = TermUiState(
-        termName = mutableStateOf(name),
-        courses = mutableStateOf(courses.map { it.toCourseUiState() }),
-        startDate = mutableStateOf(startDate),
-        endDate = mutableStateOf(endDate),
+        termName = MutableStateFlow(name),
+        courses = MutableStateFlow(courses.map { it.toCourseUiState() }),
+        startDate = MutableStateFlow(startDate),
+        endDate = MutableStateFlow(endDate),
     )
 }
 
@@ -40,10 +40,10 @@ data class Course(
     val gradeScale: GradeScale,
 ) {
     fun toCourseUiState() = CourseUiState(
-        courseName = mutableStateOf(name),
-        syllabus = mutableStateOf(syllabus.toUiSyllabus()),
-        description = mutableStateOf(description ?: ""),
-        color = mutableStateOf(color)
+        courseName = MutableStateFlow(name),
+        syllabus = MutableStateFlow(syllabus.toUiSyllabus()),
+        description = MutableStateFlow(description ?: ""),
+        color = MutableStateFlow(color)
     )
 }
 
@@ -56,8 +56,8 @@ data class Syllabus(
     val items: List<SyllabusItem>
 ) {
     fun toUiSyllabus() = UiSyllabus(
-        type = mutableStateOf(SyllabusType.WeightBased),
-        items = mutableStateOf(items.map { it.toUiSyllabusItem() })
+        type = MutableStateFlow(SyllabusType.WeightBased),
+        items = MutableStateFlow(items.map { it.toUiSyllabusItem() })
     )
 }
 
@@ -65,7 +65,7 @@ data class SyllabusItem(
     val name: String, val percentage: Int
 ) {
     fun toUiSyllabusItem() = UiSyllabusItem(
-        name = mutableStateOf(name), percentage = mutableStateOf(percentage)
+        name = MutableStateFlow(name), percentage = MutableStateFlow(percentage)
     )
 }
 

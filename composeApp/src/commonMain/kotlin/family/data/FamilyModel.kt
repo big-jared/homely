@@ -3,6 +3,7 @@ package family.data
 import androidx.compose.runtime.mutableStateOf
 import family.domain.FamilyUiState
 import family.domain.StudentInput
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.datetime.LocalDate
 
 data class Family(
@@ -13,9 +14,9 @@ data class Family(
     val defaultEnd: LocalDate? = null,
 ) {
     fun toFamilyUiState() = FamilyUiState(
-        familyName = mutableStateOf(familyName),
-        city = mutableStateOf(city),
-        students = mutableStateOf(students.map { it.toStudentInput() }),
+        familyName = MutableStateFlow(familyName),
+        city = MutableStateFlow(city),
+        students = MutableStateFlow(students.map { it.toStudentInput() }),
         defaultStart = defaultStart,
         defaultEnd = defaultEnd
     )
@@ -26,8 +27,8 @@ data class Student(
     val grade: StudentGrade,
 ) {
     fun toStudentInput() = StudentInput(
-        name = mutableStateOf(name),
-        gradeLevel = mutableStateOf(grade),
+        name = MutableStateFlow(name),
+        gradeLevel = MutableStateFlow(grade),
     )
 }
 

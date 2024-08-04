@@ -13,16 +13,8 @@ class FamilyInfoViewModel(private val familyRepository: FamilyRepository) : Scre
         familyUiState.value = familyRepository.currentFamily?.toFamilyUiState() ?: FamilyUiState()
     }
 
-    suspend fun update(): OnboardingResult {
-        val family = familyUiState.value ?: return OnboardingResult.Failure(message = "Unexpected Error Occurred, try again")
-
-        return if (family.isValid()) {
-            familyRepository.update(family.toFamily())
-            OnboardingResult.Success
-        } else {
-            OnboardingResult.Failure(message = "Unexpected error occurred")
-        }
+    suspend fun update() {
+        val family = familyUiState.value ?: throw Exception("Family Info not set!")
+        familyRepository.update(family.toFamily())
     }
-
-    fun isValid() = familyUiState.value?.isValid() == true
 }

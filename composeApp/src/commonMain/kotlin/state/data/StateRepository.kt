@@ -5,7 +5,7 @@ import family.data.Family
 import family.data.Student
 
 class StateRepository(val dataSource: StateDataSource) {
-    suspend fun getRequiredCourses(family: Family, student: Student): List<Course> {
+    suspend fun getRequiredCourses(family: Family, student: Student): Set<Course> {
         return dataSource.getRequiredCourses(family, student)
     }
 

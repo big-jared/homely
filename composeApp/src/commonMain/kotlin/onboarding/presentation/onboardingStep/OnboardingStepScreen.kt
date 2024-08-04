@@ -15,6 +15,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +40,8 @@ import org.koin.compose.koinInject
 abstract class OnboardingStep(val displayOnly: Boolean = false) : Screen {
     abstract val name: String
     abstract val contentCta: String
-
+    val canContinue: MutableState<Boolean> = mutableStateOf(false)
+    val continueSuffix: MutableState<String?> = mutableStateOf(null)
     lateinit var navigator: Navigator
 
     fun pop() {
@@ -47,10 +50,6 @@ abstract class OnboardingStep(val displayOnly: Boolean = false) : Screen {
 
     fun goTo(step: OnboardingStep) {
         navigator.push(step)
-    }
-
-    open fun canContinue(): Boolean {
-        return true
     }
 
     @Composable
@@ -96,7 +95,7 @@ abstract class OnboardingStep(val displayOnly: Boolean = false) : Screen {
                 modifier = Modifier.fillMaxWidth()
                     .padding(16.dp)
                     .height(54.dp),
-                enabled = canContinue(),
+                enabled = canContinue.value,
                 content = {
                     Text(text = if (onboardingViewModel.isLast()) "Finish" else "Continue")
                 },

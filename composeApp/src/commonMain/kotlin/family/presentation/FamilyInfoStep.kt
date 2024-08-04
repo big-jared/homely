@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,17 +52,15 @@ class FamilyInfo : OnboardingStep() {
 
     private lateinit var familyViewModel: FamilyInfoViewModel
 
-    override fun canContinue() = familyViewModel.isValid()
-
     @Composable
     override fun ColumnScope.OnboardingContent() {
         familyViewModel = koinInject()
-
         LaunchedEffect(null) {
             familyViewModel.initialize()
         }
 
         familyViewModel.familyUiState.value?.let { family ->
+            canContinue.value = family.isValid.collectAsState(false).value
             FamilyInfo(family = family)
             StudentTable(family = family)
         } ?: run {
@@ -70,19 +69,24 @@ class FamilyInfo : OnboardingStep() {
     }
 
     override suspend fun evaluateContinue(): OnboardingResult {
-        return familyViewModel.update()
+        return try {
+            familyViewModel.update()
+            OnboardingResult.Success
+        } catch (e: Exception) {
+            OnboardingResult.Failure()
+        }
     }
 
     @Composable
     fun FamilyInfo(modifier: Modifier = Modifier, family: FamilyUiState) {
         val bottomSheetNavigator = LocalBottomSheetNavigator.current
-        Row {
+        Row(modifier) {
             Column(modifier = Modifier.weight(.5f)) {
                 Text(text = "Family Name")
             }
             OutlinedTextField(
                 modifier = Modifier.padding(start = 16.dp).weight(.5f),
-                value = family.familyName.value,
+                value = family.familyName.collectAsState().value,
                 onValueChange = { family.familyName.value = it },
                 shape = RoundedCornerShape(16.dp)
             )
@@ -101,7 +105,7 @@ class FamilyInfo : OnboardingStep() {
             }
             OutlinedTextField(
                 modifier = Modifier.padding(start = 16.dp).weight(.5f),
-                value = family.city.value,
+                value = family.city.collectAsState().value,
                 onValueChange = { family.city.value = it },
                 shape = RoundedCornerShape(16.dp),
                 trailingIcon = {
@@ -178,7 +182,7 @@ class FamilyInfo : OnboardingStep() {
         ) {
             Row(modifier = modifier.padding(top = 4.dp)) {
                 ConfigurableInput(
-                    text = student.name.value ?: "",
+                    text = student.name.collectAsState().value ?: "",
                     onTextChange = { student.name.value = it },
                     label = "Name",
                     trailing = {
@@ -186,7 +190,7 @@ class FamilyInfo : OnboardingStep() {
                             HighlightBox(
                                 modifier = Modifier.align(Alignment.CenterVertically)
                                     .padding(horizontal = 2.dp, vertical = 8.dp),
-                                text = student.gradeLevel.value?.name ?: "Select Grade",
+                                text = student.gradeLevel.collectAsState().value?.name ?: "Select Grade",
                                 color = MaterialTheme.colorScheme.primary,
                                 backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
                                 frontIcon = {

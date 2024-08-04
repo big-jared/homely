@@ -65,9 +65,9 @@ import common.orange
 import common.purple
 import common.red
 import common.yellow
+import course.data.SyllabusType
 import course.domain.CourseUiState
 import course.domain.CourseSetupViewModel
-import course.domain.SyllabusType
 import course.domain.UiSyllabusItem
 import course.domain.defaultSyllabus
 import org.koin.compose.koinInject

@@ -13,21 +13,24 @@ import course.data.SyllabusType
 import course.data.Term
 import course.data.defaultGradeScale
 import family.data.Student
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlin.time.Duration
 
 data class TermUiState(
-    val termName: MutableState<String> = mutableStateOf("${student.grade.name} Grade"),
-    val startDate: MutableState<LocalDate?> = mutableStateOf(null),
-    val endDate: MutableState<LocalDate?> = mutableStateOf(null),
-    val courses: MutableState<List<CourseUiState>> = mutableStateOf(emptyList()),
+    val termName: MutableStateFlow<String>,
+    val startDate: MutableStateFlow<LocalDate?> = MutableStateFlow(null),
+    val endDate: MutableStateFlow<LocalDate?> = MutableStateFlow(null),
+    val courses: MutableStateFlow<List<CourseUiState>> = MutableStateFlow(emptyList()),
 ) {
-    fun isValid() = this.courses.value.all { it.isValid() } &&
-            this.startDate.value != null &&
-            this.endDate.value != null &&
-            this.termName.value.isNotEmpty()
-
+    fun isValid() = combine(termName, startDate, endDate, courses) { name, start, end, courses ->
+        courses.all { it.isValid() } &&
+        start != null &&
+        end != null &&
+        name.isNotEmpty()
+    }
     fun toTerm() = Term(
         name = termName.value,
         startDate = startDate.value ,
@@ -68,14 +71,14 @@ data class UiClassInterval(
 }
 
 data class CourseUiState(
-    val courseName: MutableState<String> = mutableStateOf(""),
-    val description: MutableState<String> = mutableStateOf(""),
-    val time: MutableState<LocalTime?> = mutableStateOf(null),
-    val duration: MutableState<Duration?> = mutableStateOf(null),
-    val interval: MutableState<UiClassInterval> = mutableStateOf(UiClassInterval()),
-    val color: MutableState<Int> = mutableStateOf(red.toArgb()),
-    val syllabus: MutableState<UiSyllabus> = mutableStateOf(UiSyllabus()),
-    val gradeScale: MutableState<GradeScale> = mutableStateOf(defaultGradeScale()),
+    val courseName: MutableStateFlow<String> = MutableStateFlow(""),
+    val description: MutableStateFlow<String> = MutableStateFlow(""),
+    val time: MutableStateFlow<LocalTime?> = MutableStateFlow(null),
+    val duration: MutableStateFlow<Duration?> = MutableStateFlow(null),
+    val interval: MutableStateFlow<UiClassInterval> = MutableStateFlow(UiClassInterval()),
+    val color: MutableStateFlow<Int> = MutableStateFlow(red.toArgb()),
+    val syllabus: MutableStateFlow<UiSyllabus> = MutableStateFlow(UiSyllabus()),
+    val gradeScale: MutableStateFlow<GradeScale> = MutableStateFlow(defaultGradeScale()),
     val isNew: Boolean = false
 ) {
     fun isValid(): Boolean {
@@ -96,8 +99,8 @@ data class CourseUiState(
 }
 
 data class UiSyllabus(
-    val type: MutableState<SyllabusType> = mutableStateOf(SyllabusType.PointBased),
-    val items: MutableState<List<UiSyllabusItem>> = mutableStateOf(listOf(UiSyllabusItem()))
+    val type: MutableStateFlow<SyllabusType> = MutableStateFlow(SyllabusType.PointBased),
+    val items: MutableStateFlow<List<UiSyllabusItem>> = MutableStateFlow(listOf(UiSyllabusItem()))
 ) {
     fun isValid(): Boolean = (type.value == SyllabusType.WeightBased && items.value.sumOf {
         it.percentage.value ?: 0
@@ -112,8 +115,8 @@ data class UiSyllabus(
 }
 
 data class UiSyllabusItem(
-    val name: MutableState<String> = mutableStateOf(""),
-    val percentage: MutableState<Int?> = mutableStateOf(null),
+    val name: MutableStateFlow<String> = MutableStateFlow(""),
+    val percentage: MutableStateFlow<Int?> = MutableStateFlow(null),
 ) {
     fun toSyllabusItem() = SyllabusItem(
         name = name.value,
