@@ -24,6 +24,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +43,7 @@ import family.data.StudentGrade
 import family.domain.FamilyInfoViewModel
 import family.domain.FamilyUiState
 import family.domain.StudentInput
+import kotlinx.coroutines.launch
 import onboarding.presentation.OnboardingResult
 import onboarding.presentation.onboardingStep.OnboardingStep
 import org.koin.compose.koinInject
@@ -141,6 +143,7 @@ class FamilyInfo : OnboardingStep() {
 
     @Composable
     fun StudentTable(modifier: Modifier = Modifier, family: FamilyUiState) {
+        val coScope = rememberCoroutineScope()
         Column(modifier.fillMaxWidth().padding(top = 24.dp)) {
             Row {
                 Text(
@@ -150,11 +153,12 @@ class FamilyInfo : OnboardingStep() {
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium),
                 )
                 AppIconButton(modifier = Modifier, onClick = {
-                    family.students.value =
-                        family.students.value.toMutableList().also { it.add(StudentInput()) }
+                    coScope.launch {
+                        family.students.emit(family.students.value.toMutableList().also { it.add(StudentInput()) })
+                    }
                 })
             }
-            family.students.value.forEachIndexed { index, student ->
+            family.students.collectAsState().value.forEachIndexed { index, student ->
                 StudentRow(index = index, student = student, remove = { studentInput ->
                     family.students.value =
                         family.students.value.toMutableList().also { it.remove(studentInput) }

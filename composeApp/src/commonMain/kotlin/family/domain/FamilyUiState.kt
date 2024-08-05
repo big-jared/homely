@@ -1,12 +1,18 @@
 package family.domain
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import family.data.Family
 import family.data.Student
 import family.data.StudentGrade
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flattenConcat
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.flow.transform
 import kotlinx.datetime.LocalDate
 
 data class FamilyUiState(
@@ -24,10 +30,13 @@ data class FamilyUiState(
         defaultEnd = defaultEnd
     )
 
-    val isValid = combine(familyName, city, students) { familyName, city, students ->
-        familyName.isNotBlank() && city.isNotBlank() && students.all {
-            it.isValid()
-        } && students.isNotEmpty()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val studentsValid = students.flatMapLatest { students ->
+        combine(students.map { it.isValid }) { it.asList() }
+    }
+
+    val isValid = combine(familyName, city, students, studentsValid) { familyName, city, students, valid ->
+        familyName.isNotBlank() && city.isNotBlank() && students.isNotEmpty() && valid.all { it }
     }
 }
 
@@ -35,7 +44,10 @@ data class StudentInput(
     val name: MutableStateFlow<String?> = MutableStateFlow(null),
     val gradeLevel: MutableStateFlow<StudentGrade?> = MutableStateFlow(null),
 ) {
-    fun isValid(): Boolean = !name.value.isNullOrBlank() && gradeLevel.value != null
+    val isValid = combine(name, gradeLevel) { name, gradeLevel ->
+        !name.isNullOrBlank() && gradeLevel != null
+    }
+
     fun toStudent(): Student =
         Student(name = name.value ?: "", grade = gradeLevel.value ?: StudentGrade.First)
 }

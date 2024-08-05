@@ -80,7 +80,7 @@ class CoursesSetupStep : OnboardingStep() {
 
             Row(modifier = Modifier.padding(top = 24.dp)) {
                 ConfigurableInput(
-                    text = term.termName.value,
+                    text = term.termName.collectAsState().value,
                     label = "Term",
                     onTextChange = {
                         term.termName.value = it
@@ -113,7 +113,7 @@ class CoursesSetupStep : OnboardingStep() {
                                 HighlightBox(
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                         .padding(horizontal = 2.dp, vertical = 8.dp),
-                                    text = term.startDate.value?.let { formatDate(it) },
+                                    text = term.startDate.collectAsState().value?.let { formatDate(it) },
                                     color = MaterialTheme.colorScheme.primary,
                                     backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
                                     frontIcon = {
@@ -134,7 +134,7 @@ class CoursesSetupStep : OnboardingStep() {
                                 HighlightBox(
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                         .padding(horizontal = 2.dp, vertical = 8.dp),
-                                    text = term.endDate.value?.let { formatDate(it) },
+                                    text = term.endDate.collectAsState().value?.let { formatDate(it) },
                                     color = MaterialTheme.colorScheme.primary,
                                     backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
                                     frontIcon = {
@@ -170,7 +170,7 @@ class CoursesSetupStep : OnboardingStep() {
                     })
                 }
             }
-            if (term.courses.value.isEmpty()) {
+            if (term.courses.collectAsState().value.isEmpty()) {
                 FilledTonalButton(
                     modifier = Modifier.padding(top = 16.dp).align(Alignment.CenterHorizontally),
                     onClick = {
@@ -193,7 +193,7 @@ class CoursesSetupStep : OnboardingStep() {
 
     @Composable
     fun ColumnScope.CoursesTable(modifier: Modifier = Modifier, term: TermUiState) {
-        val courses = term.courses
+        val courses = term.courses.collectAsState()
 
         AnimatedVisibility(
             modifier = modifier.padding(top = 8.dp),
@@ -233,10 +233,10 @@ class CoursesSetupStep : OnboardingStep() {
         ) {
             Box(
                 modifier = Modifier.width(24.dp).height(56.dp)
-                    .background(color = Color(course.color.value))
+                    .background(color = Color(course.color.collectAsState().value))
             )
             FlowRow(modifier = Modifier.padding(horizontal = 16.dp).weight(1f)) {
-                Text(modifier = Modifier.padding(vertical = 16.dp), text = course.courseName.value)
+                Text(modifier = Modifier.padding(vertical = 16.dp), text = course.courseName.collectAsState().value)
             }
             AppIconButton(
                 modifier = Modifier.padding(end = 8.dp).align(Alignment.CenterVertically),

@@ -36,7 +36,7 @@ class CourseSetupViewModel(
 
     val nextTerm = combine(schoolingUiState, currentStudentIndex) { uiState, currentStudent ->
         if (uiState == null) return@combine null
-        if (currentStudent >= uiState.size) return@combine null
+        if (currentStudent >= uiState.size - 1) return@combine null
         uiState[currentStudent + 1]
     }
 

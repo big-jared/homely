@@ -33,6 +33,7 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -105,7 +106,7 @@ class CourseDetailsScreen(val course: CourseUiState = CourseUiState(isNew = true
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun SyllabusTable(modifier: Modifier = Modifier) {
-        val syllabus = course.syllabus.value
+        val syllabus = course.syllabus.collectAsState().value
 
         Column(
             modifier = modifier.padding(top = 16.dp).background(
@@ -115,7 +116,7 @@ class CourseDetailsScreen(val course: CourseUiState = CourseUiState(isNew = true
         ) {
             SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                 SegmentedButton(
-                    syllabus.type.value == SyllabusType.PointBased,
+                    syllabus.type.collectAsState().value == SyllabusType.PointBased,
                     shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
                     onClick = { syllabus.type.value = SyllabusType.PointBased },
                     label = {
@@ -123,7 +124,7 @@ class CourseDetailsScreen(val course: CourseUiState = CourseUiState(isNew = true
                     }
                 )
                 SegmentedButton(
-                    syllabus.type.value == SyllabusType.WeightBased,
+                    syllabus.type.collectAsState().value == SyllabusType.WeightBased,
                     onClick = { syllabus.type.value = SyllabusType.WeightBased },
                     shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
                     label = {
@@ -132,7 +133,7 @@ class CourseDetailsScreen(val course: CourseUiState = CourseUiState(isNew = true
                 )
             }
 
-            when (syllabus.type.value) {
+            when (syllabus.type.collectAsState().value) {
                 SyllabusType.PointBased -> {
                     Text(
                         modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -162,7 +163,7 @@ class CourseDetailsScreen(val course: CourseUiState = CourseUiState(isNew = true
                         Text("Use defaults")
                     }
 
-                    syllabus.items.value.forEachIndexed { index, syllabusItem ->
+                    syllabus.items.collectAsState().value.forEachIndexed { index, syllabusItem ->
                         val state = remember {
                             MutableTransitionState(false).apply {
                                 targetState = true
@@ -262,7 +263,7 @@ class CourseDetailsScreen(val course: CourseUiState = CourseUiState(isNew = true
             }
             OutlinedTextField(
                 modifier = Modifier.padding(start = 16.dp).weight(.5f),
-                value = course.courseName.value,
+                value = course.courseName.collectAsState().value,
                 onValueChange = { course.courseName.value = it }
             )
         }
@@ -298,7 +299,7 @@ class CourseDetailsScreen(val course: CourseUiState = CourseUiState(isNew = true
                 navy,
                 lightNavy
             ).forEach { color ->
-                val selected = course.color.value == color.toArgb()
+                val selected = course.color.collectAsState().value == color.toArgb()
                 ColorHintCircle(
                     modifier = Modifier.size(animateDpAsState(if (selected) 84.dp else 64.dp).value)
                         .then(
