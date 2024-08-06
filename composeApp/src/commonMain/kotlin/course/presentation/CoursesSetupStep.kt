@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import common.AppIconButton
 import common.ConfigurableInput
@@ -45,6 +46,7 @@ import course.domain.CourseUiState
 import course.domain.CourseSetupViewModel
 import course.domain.TermUiState
 import kotlinx.coroutines.launch
+import onboarding.domain.OnboardingViewModel
 import onboarding.presentation.OnboardingResult
 import onboarding.presentation.onboardingStep.OnboardingStep
 import org.koin.compose.koinInject
@@ -55,14 +57,26 @@ class CoursesSetupStep : OnboardingStep() {
     lateinit var coursesViewModel: CourseSetupViewModel
 
     override suspend fun evaluateContinue(): OnboardingResult {
-        return OnboardingResult.Success
+        return coursesViewModel.update()
+    }
+
+    override suspend fun continueToNextStep(
+        navigator: Navigator,
+        viewModel: OnboardingViewModel,
+        onFailure: (OnboardingResult.Failure) -> Unit
+    ) {
+        if (coursesViewModel.nextTerm != null) {
+            coursesViewModel.proceedToNextStudent()
+        } else {
+            super.continueToNextStep(navigator, viewModel, onFailure)
+        }
     }
 
     @Composable
     override fun ColumnScope.OnboardingContent() {
         coursesViewModel = koinInject()
         val currentTerm = coursesViewModel.currentTermState.collectAsState(null)
-        val nextTerm = coursesViewModel.nextTerm.collectAsState(null)
+        val nextTerm = coursesViewModel.nextTermState.collectAsState(null)
         val coScope = rememberCoroutineScope()
         val bottomsheetNavigator = LocalBottomSheetNavigator.current
 
@@ -71,8 +85,8 @@ class CoursesSetupStep : OnboardingStep() {
         }
 
         currentTerm.value?.uiTerm?.let { term ->
-            canContinue.value = term.isValid().collectAsState(true).value
-            continueSuffix.value = " to " + nextTerm.value?.student?.name
+            canContinue.value = term.isValid.collectAsState(false).value
+            continueSuffix.value = nextTerm.value?.let { " to ${it.student.name}" }
             Text(
                 text = "Lets get ${currentTerm.value?.student?.name} set up!",
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium),
@@ -87,7 +101,7 @@ class CoursesSetupStep : OnboardingStep() {
                     },
                     trailing = {
                         Row {
-                            if (term.startDate.value == null) {
+                            if (term.startDate.collectAsState().value == null) {
                                 HighlightBox(
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                         .padding(horizontal = 2.dp, vertical = 8.dp),

@@ -97,7 +97,7 @@ abstract class OnboardingStep(val displayOnly: Boolean = false) : Screen {
                     .height(54.dp),
                 enabled = canContinue.value,
                 content = {
-                    Text(text = if (onboardingViewModel.isLast()) "Finish" else "Continue")
+                    Text(text = if (onboardingViewModel.isLast()) "Finish" else "Continue" + (continueSuffix.value ?: ""))
                 },
                 onClick = {
                     coScope.launch {
@@ -120,7 +120,7 @@ abstract class OnboardingStep(val displayOnly: Boolean = false) : Screen {
     @Composable
     abstract fun ColumnScope.OnboardingContent()
 
-    protected suspend fun continueToNextStep(
+    open suspend fun continueToNextStep(
         navigator: Navigator,
         viewModel: OnboardingViewModel,
         onFailure: (OnboardingResult.Failure) -> Unit = {}

@@ -94,7 +94,7 @@ class CourseDetailsScreen(val course: CourseUiState = CourseUiState(isNew = true
                         viewModel.addCourse(course)
                         navigator.hide()
                     },
-                    enabled = course.isValid()
+                    enabled = course.isValid.collectAsState(false).value
                 ) {
                     Text("Create")
                 }
@@ -179,12 +179,12 @@ class CourseDetailsScreen(val course: CourseUiState = CourseUiState(isNew = true
                             ) {
                                 OutlinedTextField(
                                     modifier = Modifier.weight(.55f),
-                                    value = syllabusItem.name.value,
+                                    value = syllabusItem.name.collectAsState().value,
                                     onValueChange = { syllabusItem.name.value = it },
                                     label = { Text("Category") },
                                     placeholder = { Text("Homework") }
                                 )
-                                val weight = syllabusItem.percentage.value
+                                val weight = syllabusItem.percentage.collectAsState().value
                                 OutlinedTextField(
                                     modifier = Modifier.padding(start = 16.dp)
                                         .weight(.3f),
@@ -221,8 +221,8 @@ class CourseDetailsScreen(val course: CourseUiState = CourseUiState(isNew = true
                     Text(
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                             .padding(bottom = 8.dp),
-                        text = "Total ${syllabus.items.value.sumOf { it.percentage.value ?: 0 }}%",
-                        color = if (syllabus.isValid()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                        text = "Total ${syllabus.items.collectAsState().value.sumOf { it.percentage.value ?: 0 }}%",
+                        color = if (syllabus.isValid.collectAsState(false).value) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                     )
                     Button(
                         modifier = Modifier.align(Alignment.CenterHorizontally)

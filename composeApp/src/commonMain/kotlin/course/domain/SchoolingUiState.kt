@@ -13,8 +13,13 @@ import course.data.SyllabusType
 import course.data.Term
 import course.data.defaultGradeScale
 import family.data.Student
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.transform
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlin.time.Duration
@@ -25,26 +30,29 @@ data class TermUiState(
     val endDate: MutableStateFlow<LocalDate?> = MutableStateFlow(null),
     val courses: MutableStateFlow<List<CourseUiState>> = MutableStateFlow(emptyList()),
 ) {
-    fun isValid() = combine(termName, startDate, endDate, courses) { name, start, end, courses ->
-        courses.all { it.isValid() } &&
-        start != null &&
-        end != null &&
-        name.isNotEmpty()
+    val isValid = combine(
+        termName, startDate, endDate, courses
+    ) { name, startDate, endDate, courses ->
+        name.isNotEmpty() && startDate != null && endDate != null && startDate < endDate && courses.isNotEmpty()
     }
+
+//    val isValid = combine(
+//        termName, startDate, endDate, courses, coursesValid
+//    ) { name, start, end, courses, coursesValid ->
+//        name.isNotEmpty() && courses.isNotEmpty() && start != null && end != null && coursesValid.all { it }
+//    }
+
     fun toTerm() = Term(
         name = termName.value,
-        startDate = startDate.value ,
-        endDate = startDate.value,
+        startDate = startDate.value,
+        endDate = endDate.value,
         courses = courses.value.map { it.toCourse() }.toSet(),
     )
 }
 
 data class SchoolingUiState(
-    val student: Student,
-    val uiTerm: TermUiState
-) {
-    fun isValid() = uiTerm.isValid()
-}
+    val student: Student, val uiTerm: TermUiState
+)
 
 data class UiClassInterval(
     val monday: MutableState<Boolean> = mutableStateOf(true),
@@ -81,8 +89,10 @@ data class CourseUiState(
     val gradeScale: MutableStateFlow<GradeScale> = MutableStateFlow(defaultGradeScale()),
     val isNew: Boolean = false
 ) {
-    fun isValid(): Boolean {
-        return courseName.value.isNotBlank() && syllabus.value.isValid()
+    private val syllabusValid: Flow<Boolean> = syllabus.transform { it.isValid }
+
+    val isValid = combine(courseName, syllabusValid) { name, syllabusValid ->
+        name.isNotBlank() && syllabusValid
     }
 
     fun toCourse() = Course(
@@ -102,25 +112,32 @@ data class UiSyllabus(
     val type: MutableStateFlow<SyllabusType> = MutableStateFlow(SyllabusType.PointBased),
     val items: MutableStateFlow<List<UiSyllabusItem>> = MutableStateFlow(listOf(UiSyllabusItem()))
 ) {
-    fun isValid(): Boolean = (type.value == SyllabusType.WeightBased && items.value.sumOf {
-        it.percentage.value ?: 0
-    } == 100) || type.value == SyllabusType.PointBased
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val itemsValid = items.flatMapLatest { items ->
+        combine(items.map { it.isValid }) { it.asList() }
+    }
 
-    fun toSyllabus() = Syllabus(
-        type = type.value,
-        items = items.value.map {
-            it.toSyllabusItem()
-        }
-    )
+    val isValid = combine(type, items, itemsValid) { type, items, itemsValid ->
+        itemsValid.all { it } && (type == SyllabusType.WeightBased && items.sumOf {
+            it.percentage.value ?: 0
+        } == 100) || type == SyllabusType.PointBased
+    }
+
+    fun toSyllabus() = Syllabus(type = type.value, items = items.value.map {
+        it.toSyllabusItem()
+    })
 }
 
 data class UiSyllabusItem(
     val name: MutableStateFlow<String> = MutableStateFlow(""),
     val percentage: MutableStateFlow<Int?> = MutableStateFlow(null),
 ) {
+    val isValid = combine(name, percentage) { name, percentage ->
+        name.isNotEmpty() && percentage?.let { it in 1..100 } == true
+    }
+
     fun toSyllabusItem() = SyllabusItem(
-        name = name.value,
-        percentage = percentage.value ?: 0
+        name = name.value, percentage = percentage.value ?: 0
     )
 }
 
@@ -129,6 +146,5 @@ val defaultSyllabus = Syllabus(
         SyllabusItem(name = "Homework", percentage = 20),
         SyllabusItem(name = "Quiz", percentage = 30),
         SyllabusItem(name = "Test", percentage = 50),
-    ),
-    type = SyllabusType.WeightBased
+    ), type = SyllabusType.WeightBased
 )

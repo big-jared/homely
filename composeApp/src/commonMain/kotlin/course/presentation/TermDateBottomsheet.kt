@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DateRange
-import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -16,7 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,8 +37,8 @@ import kotlinx.datetime.toLocalDateTime
 
 fun formatDate(localDate: LocalDate): String {
     val month = localDate.month.name.lowercase().capitalize(Locale.current).take(3)
-    val day = localDate.dayOfMonth + 1
-    return if (localDate == now().toLocalDateTime(TimeZone.currentSystemDefault()).date) "Today" else "$month $day"
+    val day = localDate.dayOfMonth
+    return if (localDate == now().toLocalDateTime(TimeZone.UTC).date) "Today" else "$month $day"
 }
 
 class TermDateBottomsheet(val termUiState: TermUiState, val saveAsDefaults: () -> Unit): Screen {
@@ -50,9 +48,9 @@ class TermDateBottomsheet(val termUiState: TermUiState, val saveAsDefaults: () -
     override fun Content() {
         val navigator = LocalBottomSheetNavigator.current
         val initialStartMs =
-            termUiState.startDate.value?.let { (it.toEpochDays() + 1) * 24L * 60 * 60 * 1000 }
+            termUiState.startDate.collectAsState().value?.let { (it.toEpochDays() + 1) * 24L * 60 * 60 * 1000 }
         val initialEndMs =
-            termUiState.endDate.value?.let { (it.toEpochDays() + 1) * 24L * 60 * 60 * 1000 }
+            termUiState.endDate.collectAsState().value?.let { (it.toEpochDays() + 1) * 24L * 60 * 60 * 1000 }
 
         val startDatePickerState = rememberDatePickerState(initialSelectedDateMillis = initialStartMs)
         val endDatePickerState = rememberDatePickerState(initialSelectedDateMillis = initialEndMs)
@@ -63,13 +61,13 @@ class TermDateBottomsheet(val termUiState: TermUiState, val saveAsDefaults: () -
             termUiState.startDate.value = Instant.fromEpochMilliseconds(
                 startDatePickerState.selectedDateMillis ?: return@run
             ).toLocalDateTime(
-                TimeZone.currentSystemDefault()
+                TimeZone.UTC
             ).date
 
             termUiState.endDate.value = Instant.fromEpochMilliseconds(
                 endDatePickerState.selectedDateMillis ?: return@run
             ).toLocalDateTime(
-                TimeZone.currentSystemDefault()
+                TimeZone.UTC
             ).date
         }
 

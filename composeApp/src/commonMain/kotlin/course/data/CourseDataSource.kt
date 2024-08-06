@@ -13,7 +13,7 @@ interface CourseDataSource {
 }
 
 class DemoCourseDataSource(private val useDefaults: Boolean = false) : CourseDataSource {
-    private var currentTerms = mutableMapOf<Student, Term>()
+    private var currentTerms = mutableMapOf<Student, Set<Term>>()
 
     private val defaultTerm = Term(
         name = "Term",
@@ -25,10 +25,10 @@ class DemoCourseDataSource(private val useDefaults: Boolean = false) : CourseDat
     override suspend fun getTermsForStudent(student: Student): Set<Term> {
         return if (useDefaults) {
             setOf(defaultTerm)
-        } else emptySet()
+        } else currentTerms[student] ?: return emptySet()
     }
 
     override suspend fun setTermForStudent(term: Term, student: Student) {
-        currentTerms[student] = term
+        currentTerms[student] = (currentTerms[student] ?: emptySet()).toMutableSet().also { it.add(term) }
     }
 }
