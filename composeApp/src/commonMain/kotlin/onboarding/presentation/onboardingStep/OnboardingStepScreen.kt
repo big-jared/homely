@@ -43,13 +43,11 @@ abstract class OnboardingStep(val displayOnly: Boolean = false) : Screen {
     val canContinue: MutableState<Boolean> = mutableStateOf(false)
     val continueSuffix: MutableState<String?> = mutableStateOf(null)
     lateinit var navigator: Navigator
+    var dialogState: MutableState<OnboardingResult.Failure?> = mutableStateOf(null)
 
-    fun pop() {
+    open fun pop(): Boolean {
         navigator.pop()
-    }
-
-    fun goTo(step: OnboardingStep) {
-        navigator.push(step)
+        return true
     }
 
     @Composable
@@ -57,7 +55,6 @@ abstract class OnboardingStep(val displayOnly: Boolean = false) : Screen {
         val onboardingViewModel = koinInject<OnboardingViewModel>()
         val coScope = rememberCoroutineScope()
         this.navigator = LocalNavigator.currentOrThrow
-        var dialogState by remember { mutableStateOf<OnboardingResult.Failure?>(null) }
 
         Column(modifier = Modifier.fillMaxSize()) {
             if (displayOnly) {
@@ -102,14 +99,14 @@ abstract class OnboardingStep(val displayOnly: Boolean = false) : Screen {
                 onClick = {
                     coScope.launch {
                         continueToNextStep(navigator, onboardingViewModel) {
-                            dialogState = it
+                            dialogState.value = it
                         }
                     }
                 }
             )
-            dialogState?.let {
+            dialogState.value?.let {
                 BasicAlertDialog(it.title, it.message, onClose = {
-                    dialogState = null
+                    dialogState.value = null
                 })
             }
         }

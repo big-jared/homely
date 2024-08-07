@@ -56,6 +56,15 @@ class CoursesSetupStep : OnboardingStep() {
     override val contentCta = ""
     lateinit var coursesViewModel: CourseSetupViewModel
 
+    override fun pop(): Boolean {
+        if (coursesViewModel.previousTerm == null) {
+            return super.pop()
+        } else {
+            coursesViewModel.backToPreviousStudent()
+            return false
+        }
+    }
+
     override suspend fun evaluateContinue(): OnboardingResult {
         return coursesViewModel.update()
     }
@@ -66,7 +75,14 @@ class CoursesSetupStep : OnboardingStep() {
         onFailure: (OnboardingResult.Failure) -> Unit
     ) {
         if (coursesViewModel.nextTerm != null) {
-            coursesViewModel.proceedToNextStudent()
+            when (val result = evaluateContinue()) {
+                is OnboardingResult.Success -> {
+                    coursesViewModel.proceedToNextStudent()
+                }
+                is OnboardingResult.Failure -> {
+                    dialogState.value = result
+                }
+            }
         } else {
             super.continueToNextStep(navigator, viewModel, onFailure)
         }

@@ -40,21 +40,16 @@ class OnboardingViewModel(
 
     fun isLast(): Boolean = activeIndex == (steps.size - 1)
 
-    suspend fun goTo(step: OnboardingStep) {
-        current().goTo(steps[activeIndex])
-        activeIndex = steps.indexOf(step)
-        _activeIndexFlow.emit(activeIndex)
-    }
-
     suspend fun initialize() {
         _complete.value = onboardingRepository.isCompleted()
         _initialized.value = true
     }
 
     suspend fun back() {
-        if (activeIndex > 0) activeIndex -= 1
-        _activeIndexFlow.emit(activeIndex)
-        current().pop()
+        if (current().pop()) {
+            if (activeIndex > 0) activeIndex -= 1
+            _activeIndexFlow.emit(activeIndex)
+        }
     }
 
     suspend fun proceed(): OnboardingStep? {

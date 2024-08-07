@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transform
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
+import kotlin.random.Random
 import kotlin.time.Duration
 
 data class TermUiState(
@@ -29,6 +30,7 @@ data class TermUiState(
     val startDate: MutableStateFlow<LocalDate?> = MutableStateFlow(null),
     val endDate: MutableStateFlow<LocalDate?> = MutableStateFlow(null),
     val courses: MutableStateFlow<List<CourseUiState>> = MutableStateFlow(emptyList()),
+    val existingTerm: Term? = null
 ) {
     val isValid = combine(
         termName, startDate, endDate, courses
@@ -36,13 +38,8 @@ data class TermUiState(
         name.isNotEmpty() && startDate != null && endDate != null && startDate < endDate && courses.isNotEmpty()
     }
 
-//    val isValid = combine(
-//        termName, startDate, endDate, courses, coursesValid
-//    ) { name, start, end, courses, coursesValid ->
-//        name.isNotEmpty() && courses.isNotEmpty() && start != null && end != null && coursesValid.all { it }
-//    }
-
     fun toTerm() = Term(
+        id = existingTerm?.id ?: Random.nextInt(),
         name = termName.value,
         startDate = startDate.value,
         endDate = endDate.value,

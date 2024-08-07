@@ -16,10 +16,11 @@ class DemoCourseDataSource(private val useDefaults: Boolean = false) : CourseDat
     private var currentTerms = mutableMapOf<Student, Set<Term>>()
 
     private val defaultTerm = Term(
+        id = 123141231,
         name = "Term",
         courses = demoCourses.toSet(),
-        startDate = now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
-        endDate = now().plus(200.days).toLocalDateTime(TimeZone.currentSystemDefault()).date,
+        startDate = now().toLocalDateTime(TimeZone.UTC).date,
+        endDate = now().plus(200.days).toLocalDateTime(TimeZone.UTC).date,
     )
 
     override suspend fun getTermsForStudent(student: Student): Set<Term> {
@@ -29,6 +30,12 @@ class DemoCourseDataSource(private val useDefaults: Boolean = false) : CourseDat
     }
 
     override suspend fun setTermForStudent(term: Term, student: Student) {
-        currentTerms[student] = (currentTerms[student] ?: emptySet()).toMutableSet().also { it.add(term) }
+        currentTerms[student] = (currentTerms[student] ?: emptySet()).toMutableSet().also { terms ->
+
+            // Theoretically a Set is unique, and this shouldn't be necessary, but just doing terms.add(term) and relying
+            // on equals wasn't working for some reason. So this for now
+            terms.remove(terms.firstOrNull { it.id == term.id })
+            terms.add(term)
+        }
     }
 }

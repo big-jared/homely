@@ -1,6 +1,5 @@
 package course.domain
 
-import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
 import course.data.SchoolingRepository
 import course.data.Term
@@ -51,6 +50,7 @@ class CourseSetupViewModel(
 
     val currentTerm get() = schoolingUiState.value?.get(currentStudentIndex.value)
     val nextTerm get() = try { schoolingUiState.value?.get(currentStudentIndex.value + 1) } catch (e: Exception) { null }
+    val previousTerm get() = try { schoolingUiState.value?.get(currentStudentIndex.value - 1) } catch (e: Exception) { null }
 
     suspend fun initialize() {
         schoolingRepository.initialize()
@@ -73,12 +73,22 @@ class CourseSetupViewModel(
 
     suspend fun setDefaultDates() {
         val currentFamily = familyRepository.currentFamily ?: return
+        val startDate = currentTerm?.uiTerm?.startDate?.value ?: return
+        val endDate = currentTerm?.uiTerm?.endDate?.value ?: return
+
+        // Save to repository data source
         familyRepository.update(
             currentFamily.copy(
-                defaultStart = currentTerm?.uiTerm?.startDate?.value ?: return,
-                defaultEnd = currentTerm?.uiTerm?.endDate?.value ?: return,
+                defaultStart = startDate,
+                defaultEnd = endDate,
             )
         )
+
+        // Save to upcoming students if not set
+        schoolingUiState.value?.forEach { entry ->
+            if (entry.uiTerm.startDate.value == null) entry.uiTerm.startDate.value = startDate
+            if (entry.uiTerm.endDate.value == null) entry.uiTerm.endDate.value = endDate
+        }
     }
 
     suspend fun selectDefaultSyllabusForTerm() {
@@ -107,5 +117,10 @@ class CourseSetupViewModel(
 
     fun proceedToNextStudent() {
         currentStudentIndex.value += 1
+
+    }
+
+    fun backToPreviousStudent() {
+        currentStudentIndex.value -= 1
     }
 }

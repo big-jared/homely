@@ -15,6 +15,8 @@ Foundation still in progress
 [Designs](https://www.figma.com/design/d5sLjwLWIATF15Vwaf1hY8/homely-team-library?node-id=0-1&t=ct6DA2rb8WKBdMV0-1)
 
 * Building instructions:
+  - Install Android studio
+  - Install the kotlin multiplatform plugin
   - Wasm: ./gradlew wasmJsBrowserDevelopmentRun
   - Desktop: ./gradlew :composeApp:run
   - server: ./gradlew (currently [issue](https://youtrack.jetbrains.com/issue/KTOR-7054/NoSuchMethodError-when-using-coroutines-1.9.0-RC) with coroutines 1.9.0-RC)

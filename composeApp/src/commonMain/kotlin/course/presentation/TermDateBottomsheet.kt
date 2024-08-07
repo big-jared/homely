@@ -48,9 +48,9 @@ class TermDateBottomsheet(val termUiState: TermUiState, val saveAsDefaults: () -
     override fun Content() {
         val navigator = LocalBottomSheetNavigator.current
         val initialStartMs =
-            termUiState.startDate.collectAsState().value?.let { (it.toEpochDays() + 1) * 24L * 60 * 60 * 1000 }
+            termUiState.startDate.collectAsState().value?.let { (it.toEpochDays()) * 24L * 60 * 60 * 1000 }
         val initialEndMs =
-            termUiState.endDate.collectAsState().value?.let { (it.toEpochDays() + 1) * 24L * 60 * 60 * 1000 }
+            termUiState.endDate.collectAsState().value?.let { (it.toEpochDays()) * 24L * 60 * 60 * 1000 }
 
         val startDatePickerState = rememberDatePickerState(initialSelectedDateMillis = initialStartMs)
         val endDatePickerState = rememberDatePickerState(initialSelectedDateMillis = initialEndMs)

@@ -9,9 +9,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
+import kotlin.random.Random
 import kotlin.time.Duration
 
 data class Term(
+    val id: Int,
     val name: String,
     val courses: Set<Course>,
     val startDate: LocalDate?,
@@ -25,7 +27,22 @@ data class Term(
         courses = MutableStateFlow(courses.map { it.toCourseUiState() }),
         startDate = MutableStateFlow(startDate),
         endDate = MutableStateFlow(endDate),
+        existingTerm = this
     )
+
+    override fun equals(other: Any?): Boolean {
+        return if (other is Term && other.id == this.id) true else super.equals(other)
+    }
+
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + name.hashCode()
+        result = 31 * result + courses.hashCode()
+        result = 31 * result + (startDate?.hashCode() ?: 0)
+        result = 31 * result + (endDate?.hashCode() ?: 0)
+        result = 31 * result + active.hashCode()
+        return result
+    }
 }
 
 data class Course(
@@ -84,7 +101,13 @@ data class ClassInterval(
 
     companion object {
         fun weekDays(): ClassInterval = ClassInterval(
-            monday = true, tuesday = true, wednesday = true, thursday = true, friday = true, saturday = false, sunday = false
+            monday = true,
+            tuesday = true,
+            wednesday = true,
+            thursday = true,
+            friday = true,
+            saturday = false,
+            sunday = false
         )
     }
 }
